@@ -10,6 +10,7 @@
 #include "prompt.h"
 
 #define BACKSPACE 127
+#define trigger_eof() do { ch = EOF; goto break_loop; } while(0)
 
 char *
 prompt(const char *prompt)
@@ -68,10 +69,7 @@ prompt(const char *prompt)
       case CTRL('A'): beginning_of_line(&chpos); break;
       case CTRL('B'): backward_char(&chpos); break;
       case CTRL('D'): if (chcounter == 0)
-                      {
-                        ch = EOF;
-                        goto break_loop;
-                      }
+                        trigger_eof();
                       else
                         delete_char(buf, &chcounter, &chpos);
                       break;
