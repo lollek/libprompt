@@ -31,7 +31,7 @@ handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
 }
 
 void
-handle_backspace(char buf[], unsigned *counter, unsigned *pos)
+backward_delete_char(char buf[], unsigned *counter, unsigned *pos)
 {
   if (*pos == 0)
     putchar('\a');
@@ -105,7 +105,7 @@ void
 delete_char(char buf[], unsigned *counter, unsigned *pos)
 {
   if (forward_char(buf, counter, pos) == 0)
-    handle_backspace(buf, counter, pos);
+    backward_delete_char(buf, counter, pos);
 }
 
 void

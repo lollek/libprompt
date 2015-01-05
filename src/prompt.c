@@ -64,7 +64,7 @@ prompt(const char *prompt)
 
     else switch (ch)
     {
-      case BACKSPACE: handle_backspace(buf, &chcounter, &chpos); break;
+      case BACKSPACE: backward_delete_char(buf, &chcounter, &chpos); break;
       case CTRL('A'): beginning_of_line(&chpos); break;
       case CTRL('B'): backward_char(&chpos); break;
       case CTRL('D'): if (chcounter == 0)
