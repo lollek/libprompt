@@ -71,6 +71,7 @@ prompt(const char *prompt)
       case CTRL('B'): backward_char(&chpos); break;
       case CTRL('E'): end_of_line(buf, &chcounter, &chpos); break;
       case CTRL('F'): forward_char(buf, &chcounter, &chpos); break;
+      case CTRL('L'): clear_screen(buf, &chcounter, &chpos, prompt); break;
 #ifdef DEBUG
       default: printf("%d", ch); break;
 #endif

@@ -86,6 +86,22 @@ backward_char(unsigned *pos)
 }
 
 void
+clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt)
+{
+  printf("\033[2J\033[;H");
+  if (prompt != NULL)
+    printf("%s", prompt);
+  if (*counter != 0)
+  {
+    unsigned i = 0;
+    for (i = 0; i < *counter; ++i)
+      putchar(buf[i]);
+    for (i = *counter; i > *pos; --i)
+      putchar('\b');
+  }
+}
+
+void
 end_of_line(char buf[], unsigned *counter, unsigned *pos)
 {
   while (*pos < *counter)

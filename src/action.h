@@ -17,6 +17,9 @@ void
 backward_char(unsigned *pos);
 
 void
+clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt);
+
+void
 end_of_line(char buf[], unsigned *counter, unsigned *pos);
 
 void
