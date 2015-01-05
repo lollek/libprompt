@@ -1,5 +1,6 @@
 # Created by https://www.gitignore.io
-prompt
+debug
+testfile
 
 ### C ###
 # Object files
