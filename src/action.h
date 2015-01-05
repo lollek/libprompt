@@ -22,4 +22,7 @@ end_of_line(unsigned *counter, unsigned *pos);
 void
 forward_char(unsigned *counter, unsigned *pos);
 
+void
+forward_word(char buf[], unsigned *counter, unsigned *pos);
+
 #endif /* PROMPT_ACTION_H */

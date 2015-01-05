@@ -80,3 +80,14 @@ forward_char(unsigned *counter, unsigned *pos)
   else
     putchar('\a');
 }
+
+void
+forward_word(char buf[], unsigned *counter, unsigned *pos)
+{
+  while (*pos < *counter)
+  {
+    forward_char(counter, pos);
+    if (!isalnum(buf[*pos]) && isalnum(buf[*pos -1]))
+      return;
+  }
+}

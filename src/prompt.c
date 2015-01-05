@@ -50,6 +50,7 @@ prompt(const char *prompt)
       switch (ch)
       {
         case 'b': backward_word(buf, &chpos); break;
+        case 'f': forward_word(buf, &chcounter, &chpos); break;
 #ifdef DEBUG
       default: printf("(E)%d", ch); break;
 #endif
