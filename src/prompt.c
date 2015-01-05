@@ -63,6 +63,17 @@ char *prompt(const char *prompt)
       printf("\033[%dC", chcounter - chpos);
       chpos = chcounter;
     }
+
+    else if (ch == CTRL('F'))
+    {
+      if (chpos < chcounter)
+      {
+        printf("\033[1C");
+        chpos++;
+      }
+      else
+        putchar('\a');
+    }
   }
   while (ch != EOF && chcounter < BUFSIZ);
   putchar('\n');
