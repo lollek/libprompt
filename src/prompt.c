@@ -43,7 +43,7 @@ prompt(const char *prompt)
     else if (isprint(ch))
       handle_printables(ch, buf, &chcounter, &chpos);
 
-    else if (ch == 27)
+    else if (ch == 27) /* 033 / ESCAPE */
     {
       ch = getchar();
       switch (ch)
@@ -54,7 +54,7 @@ prompt(const char *prompt)
           ch = getchar();
           switch (ch)
           {
-            case 'C': forward_char(&chcounter, &chpos); break;
+            case 'C': forward_char(buf, &chcounter, &chpos); break;
             case 'D': backward_char(&chpos); break;
             default: putchar('\a'); break;
           }
@@ -70,14 +70,14 @@ prompt(const char *prompt)
       case BACKSPACE: handle_backspace(buf, &chcounter, &chpos); break;
       case CTRL('A'): beginning_of_line(&chpos); break;
       case CTRL('B'): backward_char(&chpos); break;
-      case CTRL('E'): end_of_line(&chcounter, &chpos); break;
-      case CTRL('F'): forward_char(&chcounter, &chpos); break;
+      case CTRL('E'): end_of_line(buf, &chcounter, &chpos); break;
+      case CTRL('F'): forward_char(buf, &chcounter, &chpos); break;
 #ifdef DEBUG
       default: printf("%d", ch); break;
 #endif
     }
   }
-  while (ch != EOF && chcounter < BUFSIZE);
+  while (ch != EOF);
   putchar('\n');
 
   tcsetattr(STDIN_FILENO, TCSANOW, &oldterm);

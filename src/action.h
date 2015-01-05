@@ -17,10 +17,10 @@ void
 backward_char(unsigned *pos);
 
 void
-end_of_line(unsigned *counter, unsigned *pos);
+end_of_line(char buf[], unsigned *counter, unsigned *pos);
 
 void
-forward_char(unsigned *counter, unsigned *pos);
+forward_char(char buf[], unsigned *counter, unsigned *pos);
 
 void
 forward_word(char buf[], unsigned *counter, unsigned *pos);

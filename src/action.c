@@ -8,22 +8,26 @@ void
 handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
 {
   if (*counter == BUFSIZE)
-  {
     putchar('\a');
-    return;
-  }
-
-  if (*pos != *counter)
+  else if (*pos != *counter)
   {
+    unsigned i;
     memmove(buf + *pos +1, buf + *pos, *counter - *pos);
+    buf[*pos] = ch;
     buf[*counter + 1] = '\0';
-    printf("\033[1C%s\033[%dD", buf + *pos + 1, *counter - *pos + 1);
+    printf("%s", buf + *pos);
+    for (i = *pos; i < *counter; ++i)
+      putchar('\b');
+    (*counter)++;
+    (*pos)++;
   }
-
-  putchar(ch);
-  buf[*pos] = ch;
-  (*counter)++;
-  (*pos)++;
+  else
+  {
+    putchar(ch);
+    buf[*pos] = ch;
+    (*counter)++;
+    (*pos)++;
+  }
 }
 
 void
@@ -33,18 +37,21 @@ handle_backspace(char buf[], unsigned *counter, unsigned *pos)
     putchar('\a');
   else if (*pos == *counter)
   {
-    printf("\033[1D \033[1D");
+    printf("\b \b");
     (*counter)--;
     (*pos)--;
   }
   else
   {
+    unsigned i;
     memmove(buf + *pos -1, buf + *pos, *counter - *pos);
     (*counter)--;
     (*pos)--;
 
     buf[*counter] = '\0';
-    printf("\033[1D%s \033[%dD", buf + *pos, *counter - *pos + 1);
+    printf("\b%s \b", buf + *pos);
+    for (i = *pos; i < *counter; ++i)
+      putchar('\b');
   }
 }
 
@@ -62,11 +69,8 @@ backward_word(char buf[], unsigned *pos)
 void
 beginning_of_line(unsigned *pos)
 {
-  if (*pos == 0)
-    return;
-
-  printf("\033[%uD", *pos);
-  *pos = 0;
+  while (*pos > 0)
+    backward_char(pos);
 }
 
 void
@@ -76,27 +80,24 @@ backward_char(unsigned *pos)
     putchar('\a');
   else
   {
-    printf("\033[1D");
+    printf("\b");
     (*pos)--;
   }
 }
 
 void
-end_of_line(unsigned *counter, unsigned *pos)
+end_of_line(char buf[], unsigned *counter, unsigned *pos)
 {
-  if (*pos < *counter)
-  {
-    printf("\033[%dC", *counter - *pos);
-    *pos = *counter;
-  }
+  while (*pos < *counter)
+    forward_char(buf, counter, pos);
 }
 
 void
-forward_char(unsigned *counter, unsigned *pos)
+forward_char(char buf[], unsigned *counter, unsigned *pos)
 {
   if (*pos < *counter)
   {
-    printf("\033[1C");
+    putchar(buf[*pos]);
     (*pos)++;
   }
   else
@@ -108,7 +109,7 @@ forward_word(char buf[], unsigned *counter, unsigned *pos)
 {
   while (*pos < *counter)
   {
-    forward_char(counter, pos);
+    forward_char(buf, counter, pos);
     if (!isalnum(buf[*pos]) && isalnum(buf[*pos -1]))
       return;
   }
