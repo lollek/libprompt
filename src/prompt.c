@@ -58,6 +58,12 @@ char *prompt(const char *prompt)
         putchar('\a');
     }
 
+    else if (ch == CTRL('D') && chcounter == 0)
+    {
+      ch = EOF;
+      break;
+    }
+
     else if (ch == CTRL('E') && chpos < chcounter)
     {
       printf("\033[%dC", chcounter - chpos);
