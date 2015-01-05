@@ -7,17 +7,20 @@
 
 #include "prompt.h"
 
+#define DEBUG
 #define BACKSPACE 127
+#define BUFSIZE 4096
 
-char *prompt(const char *prompt)
+char *
+prompt(const char *prompt)
 {
   struct termios oldterm;
   struct termios tmpterm;
-  char buf[BUFSIZ];
+  char buf[BUFSIZE];
   char *retval = NULL;
   int ch;
-  size_t chcounter = 0;
-  size_t chpos = chcounter;
+  unsigned chcounter = 0;
+  unsigned chpos = chcounter;
 
 
   tcgetattr(STDIN_FILENO, &oldterm);
@@ -45,7 +48,7 @@ char *prompt(const char *prompt)
 
     else if (ch == CTRL('A') && chpos > 0)
     {
-      printf("\033[%dD", chpos);
+      printf("\033[%uD", chpos);
       chpos = 0;
     }
 
@@ -94,8 +97,13 @@ char *prompt(const char *prompt)
       else
         putchar('\a');
     }
+
+#ifdef DEBUG
+    else
+      printf("%d\n", ch);
+#endif
   }
-  while (ch != EOF && chcounter < BUFSIZ);
+  while (ch != EOF && chcounter < BUFSIZE);
   putchar('\n');
 
   tcsetattr(STDIN_FILENO, TCSANOW, &oldterm);
