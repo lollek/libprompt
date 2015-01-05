@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "prompt.h"
+#include "../src/prompt.h"
 
 int main(void)
 {

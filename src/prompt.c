@@ -9,7 +9,6 @@
 
 #include "prompt.h"
 
-#define DEBUG
 #define BACKSPACE 127
 
 char *
