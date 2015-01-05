@@ -7,6 +7,8 @@
 
 #include "prompt.h"
 
+#define BACKSPACE 127
+
 char *prompt(const char *prompt)
 {
   struct termios oldterm;
@@ -76,6 +78,18 @@ char *prompt(const char *prompt)
       {
         printf("\033[1C");
         chpos++;
+      }
+      else
+        putchar('\a');
+    }
+
+    else if (ch == BACKSPACE)
+    {
+      if (chpos > 0 && chpos == chcounter)
+      {
+        printf("\033[1D \033[1D");
+        chcounter--;
+        chpos--;
       }
       else
         putchar('\a');
