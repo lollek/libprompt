@@ -2,10 +2,13 @@
 #define PROMPT_ACTION_H
 
 void
-handle_printables(int ch, char *buf, unsigned *counter, unsigned *pos);
+handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos);
 
 void
 handle_backspace(unsigned *counter, unsigned *pos);
+
+void
+backward_word(char buf[], unsigned *pos);
 
 void
 beginning_of_line(unsigned *pos);

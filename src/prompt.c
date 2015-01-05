@@ -44,6 +44,18 @@ prompt(const char *prompt)
     else if (isprint(ch))
       handle_printables(ch, buf, &chcounter, &chpos);
 
+    else if (ch == 27)
+    {
+      ch = getchar();
+      switch (ch)
+      {
+        case 'b': backward_word(buf, &chpos); break;
+#ifdef DEBUG
+      default: printf("(E)%d", ch); break;
+#endif
+      }
+    }
+
     else switch (ch)
     {
       case BACKSPACE: handle_backspace(&chcounter, &chpos); break;
@@ -52,7 +64,7 @@ prompt(const char *prompt)
       case CTRL('E'): end_of_line(&chcounter, &chpos); break;
       case CTRL('F'): forward_char(&chcounter, &chpos); break;
 #ifdef DEBUG
-      default: printf("%d\n", ch); break;
+      default: printf("%d", ch); break;
 #endif
     }
   }

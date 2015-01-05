@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <ctype.h>
 
 #include "action.h"
 
 void
-handle_printables(int ch, char *buf, unsigned *counter, unsigned *pos)
+handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
 {
   putchar(ch);
   buf[*pos] = ch;
@@ -23,6 +24,17 @@ handle_backspace(unsigned *counter, unsigned *pos)
   }
   else
     putchar('\a');
+}
+
+void
+backward_word(char buf[], unsigned *pos)
+{
+  while (*pos > 0)
+  {
+    backward_char(pos);
+    if (isalnum(buf[*pos]) && !isalnum(buf[*pos -1]))
+      return;
+  }
 }
 
 void
