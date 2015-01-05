@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "action.h"
 
@@ -14,16 +15,25 @@ handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
 }
 
 void
-handle_backspace(unsigned *counter, unsigned *pos)
+handle_backspace(char buf[], unsigned *counter, unsigned *pos)
 {
-  if (*pos > 0 && *pos == *counter)
+  if (*pos == 0)
+    putchar('\a');
+  else if (*pos == *counter)
   {
     printf("\033[1D \033[1D");
     (*counter)--;
     (*pos)--;
   }
   else
-    putchar('\a');
+  {
+    memmove(buf + *pos -1, buf + *pos, *counter - *pos);
+    (*counter)--;
+    (*pos)--;
+
+    buf[*counter] = '\0';
+    printf("\033[1D%s \033[%dD", buf + *pos, *counter - *pos + 1);
+  }
 }
 
 void

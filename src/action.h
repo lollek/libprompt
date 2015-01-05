@@ -5,7 +5,7 @@ void
 handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos);
 
 void
-handle_backspace(unsigned *counter, unsigned *pos);
+handle_backspace(char buf[], unsigned *counter, unsigned *pos);
 
 void
 backward_word(char buf[], unsigned *pos);
