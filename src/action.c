@@ -102,22 +102,33 @@ clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt)
 }
 
 void
+delete_char(char buf[], unsigned *counter, unsigned *pos)
+{
+  if (forward_char(buf, counter, pos) == 0)
+    handle_backspace(buf, counter, pos);
+}
+
+void
 end_of_line(char buf[], unsigned *counter, unsigned *pos)
 {
   while (*pos < *counter)
     forward_char(buf, counter, pos);
 }
 
-void
+int
 forward_char(char buf[], unsigned *counter, unsigned *pos)
 {
   if (*pos < *counter)
   {
     putchar(buf[*pos]);
     (*pos)++;
+    return 0;
   }
   else
+  {
     putchar('\a');
+    return 1;
+  }
 }
 
 void

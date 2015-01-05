@@ -34,8 +34,6 @@ prompt(const char *prompt)
   {
     ch = getchar();
 
-    if (ch == CTRL('D') && chcounter == 0)
-      ch = EOF;
     if (ch == EOF || ch == '\n')
       break;
 
@@ -69,6 +67,14 @@ prompt(const char *prompt)
       case BACKSPACE: handle_backspace(buf, &chcounter, &chpos); break;
       case CTRL('A'): beginning_of_line(&chpos); break;
       case CTRL('B'): backward_char(&chpos); break;
+      case CTRL('D'): if (chcounter == 0)
+                      {
+                        ch = EOF;
+                        goto break_loop;
+                      }
+                      else
+                        delete_char(buf, &chcounter, &chpos);
+                      break;
       case CTRL('E'): end_of_line(buf, &chcounter, &chpos); break;
       case CTRL('F'): forward_char(buf, &chcounter, &chpos); break;
       case CTRL('L'): clear_screen(buf, &chcounter, &chpos, prompt); break;
@@ -78,6 +84,7 @@ prompt(const char *prompt)
     }
   }
   while (ch != EOF);
+break_loop:
   putchar('\n');
 
   tcsetattr(STDIN_FILENO, TCSANOW, &oldterm);

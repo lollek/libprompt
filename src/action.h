@@ -20,9 +20,12 @@ void
 clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt);
 
 void
-end_of_line(char buf[], unsigned *counter, unsigned *pos);
+delete_char(char buf[], unsigned *counter, unsigned *pos);
 
 void
+end_of_line(char buf[], unsigned *counter, unsigned *pos);
+
+int
 forward_char(char buf[], unsigned *counter, unsigned *pos);
 
 void
