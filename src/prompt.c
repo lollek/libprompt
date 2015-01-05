@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#include "action.h"
+
 #include "prompt.h"
 
 #define DEBUG
@@ -22,7 +24,6 @@ prompt(const char *prompt)
   unsigned chcounter = 0;
   unsigned chpos = chcounter;
 
-
   tcgetattr(STDIN_FILENO, &oldterm);
   tmpterm = oldterm;
   tmpterm.c_lflag &= ~(ICANON | ECHO);
@@ -34,74 +35,26 @@ prompt(const char *prompt)
   do
   {
     ch = getchar();
+
+    if (ch == CTRL('D') && chcounter == 0)
+      ch = EOF;
     if (ch == EOF || ch == '\n')
       break;
 
     else if (isprint(ch))
-    {
-      putchar(ch);
-      buf[chpos] = ch;
-      if (chpos == chcounter)
-        chcounter++;
-      chpos++;
-    }
+      handle_printables(ch, buf, &chcounter, &chpos);
 
-    else if (ch == CTRL('A') && chpos > 0)
+    else switch (ch)
     {
-      printf("\033[%uD", chpos);
-      chpos = 0;
-    }
-
-    else if (ch == CTRL('B'))
-    {
-      if (chpos > 0)
-      {
-        printf("\033[1D");
-        chpos--;
-      }
-      else
-        putchar('\a');
-    }
-
-    else if (ch == CTRL('D') && chcounter == 0)
-    {
-      ch = EOF;
-      break;
-    }
-
-    else if (ch == CTRL('E') && chpos < chcounter)
-    {
-      printf("\033[%dC", chcounter - chpos);
-      chpos = chcounter;
-    }
-
-    else if (ch == CTRL('F'))
-    {
-      if (chpos < chcounter)
-      {
-        printf("\033[1C");
-        chpos++;
-      }
-      else
-        putchar('\a');
-    }
-
-    else if (ch == BACKSPACE)
-    {
-      if (chpos > 0 && chpos == chcounter)
-      {
-        printf("\033[1D \033[1D");
-        chcounter--;
-        chpos--;
-      }
-      else
-        putchar('\a');
-    }
-
+      case BACKSPACE: handle_backspace(&chcounter, &chpos); break;
+      case CTRL('A'): beginning_of_line(&chpos); break;
+      case CTRL('B'): backward_char(&chpos); break;
+      case CTRL('E'): end_of_line(&chcounter, &chpos); break;
+      case CTRL('F'): forward_char(&chcounter, &chpos); break;
 #ifdef DEBUG
-    else
-      printf("%d\n", ch);
+      default: printf("%d\n", ch); break;
 #endif
+    }
   }
   while (ch != EOF && chcounter < BUFSIZE);
   putchar('\n');
