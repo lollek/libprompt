@@ -51,7 +51,15 @@ prompt(const char *prompt)
       {
         case 'b': backward_word(buf, &chpos); break;
         case 'f': forward_word(buf, &chcounter, &chpos); break;
-        case '[': ch = getchar();/* ARROW KEYS */ break;
+        case '[': /* ARROW KEYS */
+          ch = getchar();
+          switch (ch)
+          {
+            case 'C': forward_char(&chcounter, &chpos); break;
+            case 'D': backward_char(&chpos); break;
+            default: putchar('\a'); break;
+          }
+          break;
 #ifdef DEBUG
         default: printf("(E)%d", ch); break;
 #endif
