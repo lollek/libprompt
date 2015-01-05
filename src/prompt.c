@@ -31,6 +31,7 @@ char *prompt(const char *prompt)
     ch = getchar();
     if (ch == EOF || ch == '\n')
       break;
+
     else if (isprint(ch))
     {
       putchar(ch);
@@ -39,15 +40,11 @@ char *prompt(const char *prompt)
         chcounter++;
       chpos++;
     }
-    else switch (ch)
+
+    else if (ch == CTRL('A') && chpos > 0)
     {
-      case CTRL('A'):
-        while (chpos)
-        {
-          putchar('\b');
-          chpos--;
-        }
-        break;
+      printf("\033[%dD", chpos);
+      chpos = 0;
     }
   }
   while (ch != EOF && chcounter < BUFSIZ);
