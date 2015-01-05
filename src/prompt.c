@@ -11,7 +11,6 @@
 
 #define DEBUG
 #define BACKSPACE 127
-#define BUFSIZE 4096
 
 char *
 prompt(const char *prompt)

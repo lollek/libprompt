@@ -7,10 +7,22 @@
 void
 handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
 {
+  if (*counter == BUFSIZE)
+  {
+    putchar('\a');
+    return;
+  }
+
+  if (*pos != *counter)
+  {
+    memmove(buf + *pos +1, buf + *pos, *counter - *pos);
+    buf[*counter + 1] = '\0';
+    printf("\033[1C%s\033[%dD", buf + *pos + 1, *counter - *pos + 1);
+  }
+
   putchar(ch);
   buf[*pos] = ch;
-  if (*pos == *counter)
-    (*counter)++;
+  (*counter)++;
   (*pos)++;
 }
 
