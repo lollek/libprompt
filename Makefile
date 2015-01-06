@@ -4,11 +4,15 @@ PREFIX=/usr/local
 # How many characters there can be in the buffer. After BUFSIZE, you will only
 # hear a bell when trying to type something
 BUFSIZE=4096
+# How many lines that will be saved in history. After HISTSIZEMAX lines, the
+# oldest will be removed to make room for the newest
+HISTSIZEMAX=100
 ###
 
 LIBNAME=libprompt.so
 CFLAGS=-Wall -Wextra -Werror -pedantic -O3 -fpic
 CFLAGS+= -DBUFSIZE=$(BUFSIZE)
+CFLAGS+= -DHISTSIZEMAX=$(HISTSIZEMAX)
 
 LINT=cppcheck
 LINTFLAGS=--enable=all

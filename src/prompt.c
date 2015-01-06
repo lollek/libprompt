@@ -6,6 +6,7 @@
 #include <ctype.h>
 
 #include "action.h"
+#include "history.h"
 
 #include "prompt.h"
 
@@ -52,6 +53,8 @@ prompt(const char *prompt)
           ch = getchar();
           switch (ch)
           {
+            case 'A': history_prev_cmd(buf, &chcounter, &chpos); break;
+            case 'B': history_next_cmd(buf, &chcounter, &chpos); break;
             case 'C': forward_char(buf, &chcounter, &chpos); break;
             case 'D': backward_char(&chpos); break;
             default: putchar('\a'); break;
@@ -76,6 +79,8 @@ prompt(const char *prompt)
       case CTRL('E'): end_of_line(buf, &chcounter, &chpos); break;
       case CTRL('F'): forward_char(buf, &chcounter, &chpos); break;
       case CTRL('L'): clear_screen(buf, &chcounter, &chpos, prompt); break;
+      case CTRL('N'): history_next_cmd(buf, &chcounter, &chpos); break;
+      case CTRL('P'): history_prev_cmd(buf, &chcounter, &chpos); break;
 #ifdef DEBUG
       default: printf("%d", ch); break;
 #endif
@@ -96,5 +101,9 @@ break_loop:
 
   memcpy(retval, buf, chcounter);
   retval[chcounter] = '\0';
+
+  if (retval[0] != '\0')
+    history_save(retval);
+
   return retval;
 }

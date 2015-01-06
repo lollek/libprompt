@@ -16,10 +16,12 @@ libprompt aims to be a lite version of libreadline, or more specifically, readli
 * delete-char (C-d) - Delete character at position, or signal end of line if there are no characters.
 * backward-delete-char (backspace) - Delete character to the left of the current position.
 
-## To be implemented
 ### History
 * previous-command (C-p, arrow up) - Show previous entered command.
 * next-command (C-n, arrow down) - Show next entered command.
+
+## To be implemented
+### History
 * beginning-of-history (M-<) - Show the oldest saved command.
 * end-of-history (M->) Show the newest saved command.
 
