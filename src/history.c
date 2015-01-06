@@ -104,7 +104,7 @@ history_prev_cmd(char buf[], unsigned *counter, unsigned *pos)
   }
 
   beginning_of_line(pos);
-  printf("\033[K"); /* Erase from current cursor to the end of current line */
+  printf("\033[K\033[J");
 
   strcpy(buf, current->text);
   printf("%s", buf);
@@ -125,7 +125,7 @@ history_next_cmd(char buf[], unsigned *counter, unsigned *pos)
 
   current = current->next;
   beginning_of_line(pos);
-  printf("\033[K"); /* Erase from current cursor to the end of current line */
+  printf("\033[K\033[J");
 
   strcpy(buf, current->next ? current->next->text : tmpline);
   printf("%s", buf);
