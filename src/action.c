@@ -141,3 +141,15 @@ forward_word(char buf[], unsigned *counter, unsigned *pos)
       return;
   }
 }
+
+void
+prompt_set_text(char newdata[], char buf[], unsigned *counter, unsigned *pos)
+{
+  beginning_of_line(pos);
+  printf("\033[K\033[J");
+
+  strcpy(buf, newdata);
+  printf("%s", buf);
+  *counter = strlen(buf);
+  *pos = *counter;
+}

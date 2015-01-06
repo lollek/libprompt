@@ -103,14 +103,7 @@ history_prev_cmd(char buf[], unsigned *counter, unsigned *pos)
     strcpy(tmpline, buf);
   }
 
-  beginning_of_line(pos);
-  printf("\033[K\033[J");
-
-  strcpy(buf, current->text);
-  printf("%s", buf);
-  *counter = strlen(buf);
-  *pos = *counter;
-
+  prompt_set_text(current->text, buf, counter, pos);
   current = current->prev;
 }
 
@@ -124,13 +117,9 @@ history_next_cmd(char buf[], unsigned *counter, unsigned *pos)
   }
 
   current = current->next;
-  beginning_of_line(pos);
-  printf("\033[K\033[J");
+  prompt_set_text(current->next ? current->next->text : tmpline,
+                  buf, counter, pos);
 
-  strcpy(buf, current->next ? current->next->text : tmpline);
-  printf("%s", buf);
-  *counter = strlen(buf);
-  *pos = *counter;
 }
 
 void

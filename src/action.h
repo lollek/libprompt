@@ -31,4 +31,7 @@ forward_char(char buf[], unsigned *counter, unsigned *pos);
 void
 forward_word(char buf[], unsigned *counter, unsigned *pos);
 
+void
+prompt_set_text(char newdata[], char buf[], unsigned *counter, unsigned *pos);
+
 #endif /* PROMPT_ACTION_H */
