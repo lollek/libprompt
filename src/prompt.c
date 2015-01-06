@@ -10,6 +10,7 @@
 
 #include "prompt.h"
 
+#define ESCAPE 27
 #define BACKSPACE 127
 #define trigger_eof() do { ch = EOF; goto break_loop; } while(0)
 
@@ -42,7 +43,7 @@ prompt(const char *prompt)
     else if (isprint(ch))
       handle_printables(ch, buf, &chcounter, &chpos);
 
-    else if (ch == 27) /* 033 / ESCAPE */
+    else if (ch == ESCAPE)
     {
       ch = getchar();
       switch (ch)
