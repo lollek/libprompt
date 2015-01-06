@@ -9,11 +9,12 @@ int main(void)
   {
     char *line = prompt("> ");
     if (line == NULL)
-      return 0;
+      break;
 
     printf("You wrote '%s'\n", line);
     free(line);
   }
 
+  prompt_free();
   return 0;
 }

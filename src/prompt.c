@@ -107,3 +107,9 @@ break_loop:
 
   return retval;
 }
+
+void
+prompt_free(void)
+{
+  history_delete();
+}
