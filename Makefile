@@ -1,9 +1,9 @@
 ### Configurables:
+# Prefix where to place library and header.
+PREFIX=/usr/local
 # How many characters there can be in the buffer. After BUFSIZE, you will only
 # hear a bell when trying to type something
 BUFSIZE=4096
-# Prefix where to place library and header.
-PREFIX=/usr/local
 ###
 
 LIBNAME=libprompt.so
@@ -36,10 +36,15 @@ debug: $(LIBNAME) test/main.o
 	$(CC) -L. -lprompt -o $@ $^
 	LD_LIBRARY_PATH=. ./$@
 
+debugmem: CFLAGS+= -g -DDEBUG
+debugmem: $(OBJFILES) test/main.o
+	$(CC) -o $@ $^
+	valgrind ./$@
+
 lint:
 	$(LINT) $(LINTFLAGS) $(SRCFILES) $(HEADERS)
 
 clean:
-	$(RM) $(OBJFILES) $(LIBNAME) testfile debug test/main.o
+	$(RM) $(OBJFILES) $(LIBNAME) testfile debug debugmem test/main.o
 
-.PHONY:	clean lint testfile debug install
+.PHONY:	clean lint testfile debug debugmem install
