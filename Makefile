@@ -42,13 +42,13 @@ debug: $(LIBNAME) test/main.o
 
 debugmem: CFLAGS+= -g -DDEBUG
 debugmem: $(OBJFILES) test/main.o
-	$(CC) -o $@ $^
-	valgrind ./$@
+	$(CC) -o debug $^
+	valgrind ./debug
 
 lint:
 	$(LINT) $(LINTFLAGS) $(SRCFILES) $(HEADERS)
 
 clean:
-	$(RM) $(OBJFILES) $(LIBNAME) testfile debug debugmem test/main.o
+	$(RM) $(OBJFILES) $(LIBNAME) testfile debug test/main.o
 
 .PHONY:	clean lint testfile debug debugmem install
