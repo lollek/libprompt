@@ -77,7 +77,7 @@ kill_line(char buf[], unsigned *counter, unsigned *pos)
   kill_push_new(buf + *pos);
 
   *counter = *pos;
-  printf("\033[K");
+  printf("\033[K\033[J");
 }
 
 void
