@@ -71,11 +71,8 @@ history_save_tmpline(char text[])
 {
   if (tmpline != NULL)
     free(tmpline);
-  tmpline = malloc(strlen(text) + 1);
-  if (tmpline == NULL)
-    return 1;
-  strcpy(tmpline, text);
-  return 0;
+  tmpline = strdup(text);
+  return tmpline ? 0 : 1;
 }
 
 void
