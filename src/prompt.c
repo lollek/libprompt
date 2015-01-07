@@ -50,6 +50,8 @@ prompt(const char *prompt)
       {
         case 'b': backward_word(buf, &chpos); break;
         case 'f': forward_word(buf, &chcounter, &chpos); break;
+        case '<': history_first_cmd(buf, &chcounter, &chpos); break;
+        case '>': history_last_cmd(buf, &chcounter, &chpos); break;
         case '[': /* ARROW KEYS */
           ch = getchar();
           switch (ch)

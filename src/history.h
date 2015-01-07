@@ -13,4 +13,10 @@ history_next_cmd(char buf[], unsigned *counter, unsigned *pos);
 void
 history_delete(void);
 
+void
+history_first_cmd(char buf[], unsigned *counter, unsigned *pos);
+
+void
+history_last_cmd(char buf[], unsigned *counter, unsigned *pos);
+
 #endif /* PROMPT_HISTORY_H */

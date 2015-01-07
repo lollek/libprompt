@@ -66,6 +66,18 @@ history_push_new(char *text)
  current_histsize++;
 }
 
+static int
+history_save_tmpline(char text[])
+{
+  if (tmpline != NULL)
+    free(tmpline);
+  tmpline = malloc(strlen(text) + 1);
+  if (tmpline == NULL)
+    return 1;
+  strcpy(tmpline, text);
+  return 0;
+}
+
 void
 history_save(char *text)
 {
@@ -95,12 +107,8 @@ history_prev_cmd(char buf[], unsigned *counter, unsigned *pos)
   if (current->next == NULL)
   {
     buf[*counter] = '\0';
-    if (tmpline != NULL)
-      free(tmpline);
-    tmpline = malloc(strlen(buf) + 1);
-    if (tmpline == NULL)
+    if (history_save_tmpline(buf) != 0)
       return;
-    strcpy(tmpline, buf);
   }
 
   prompt_set_text(current->text, buf, counter, pos);
@@ -142,4 +150,38 @@ history_delete(void)
     free(tmpline);
     tmpline = NULL;
   }
+}
+
+void
+history_first_cmd(char buf[], unsigned *counter, unsigned *pos)
+{
+  if (root == NULL || current == root)
+  {
+    putchar('\a');
+    return;
+  }
+
+  if (current->next == NULL)
+  {
+    buf[*counter] = '\0';
+    if (history_save_tmpline(buf) != 0)
+      return;
+  }
+
+  current = root;
+  prompt_set_text(current->next->text, buf, counter, pos);
+}
+
+void
+history_last_cmd(char buf[], unsigned *counter, unsigned *pos)
+{
+  if (root == NULL || current->next == NULL)
+  {
+    putchar('\a');
+    return;
+  }
+
+  while (current->next != NULL)
+    current = current->next;
+  prompt_set_text(tmpline, buf, counter, pos);
 }

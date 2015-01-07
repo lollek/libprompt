@@ -19,12 +19,10 @@ libprompt aims to be a lite version of libreadline, or more specifically, readli
 ### History
 * previous-command (C-p, arrow up) - Show previous entered command.
 * next-command (C-n, arrow down) - Show next entered command.
-
-## To be implemented
-### History
 * beginning-of-history (M-<) - Show the oldest saved command.
 * end-of-history (M->) Show the newest saved command.
 
+## To be implemented
 ### Editing
 * kill-line (C-k) - Kill from cursor to the end of the prompt and put it in the kill-ring.
 * backward-kill-line (C-u) - Kill from cursor to the start of the prompt and put it in the kill-ring.
