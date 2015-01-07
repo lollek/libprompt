@@ -1,18 +1,25 @@
 ### Configurables:
 # Prefix where to place library and header.
 PREFIX=/usr/local
+
 # How many characters there can be in the buffer. After BUFSIZE, you will only
 # hear a bell when trying to type something
 BUFSIZE=4096
+
 # How many lines that will be saved in history. After HISTSIZEMAX lines, the
 # oldest will be removed to make room for the newest
 HISTSIZEMAX=100
+
+# How many lines that will be saved in kill-ring. After KILLSIZEMAX lines, the
+# oldest will be removed to make room for the newest
+KILLSIZEMAX=10
 ###
 
 LIBNAME=libprompt.so
 CFLAGS=-Wall -Wextra -Werror -pedantic -O3 -fpic
 CFLAGS+= -DBUFSIZE=$(BUFSIZE)
 CFLAGS+= -DHISTSIZEMAX=$(HISTSIZEMAX)
+CFLAGS+= -DKILLSIZEMAX=$(KILLSIZEMAX)
 
 LINT=cppcheck
 LINTFLAGS=--enable=all

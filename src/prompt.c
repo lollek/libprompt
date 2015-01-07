@@ -7,6 +7,7 @@
 
 #include "action.h"
 #include "history.h"
+#include "cutpaste.h"
 
 #include "prompt.h"
 
@@ -81,6 +82,7 @@ prompt(const char *prompt)
                       break;
       case CTRL('E'): end_of_line(buf, &chcounter, &chpos); break;
       case CTRL('F'): forward_char(buf, &chcounter, &chpos); break;
+      case CTRL('K'): kill_line(buf, &chcounter, &chpos); break;
       case CTRL('L'): clear_screen(buf, &chcounter, &chpos, prompt); break;
       case CTRL('N'): history_next_cmd(buf, &chcounter, &chpos); break;
       case CTRL('P'): history_prev_cmd(buf, &chcounter, &chpos); break;
@@ -115,4 +117,5 @@ void
 prompt_free(void)
 {
   history_delete();
+  kill_clear();
 }
