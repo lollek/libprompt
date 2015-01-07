@@ -2,8 +2,6 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "helperfuns.h"
-
 #include "action.h"
 
 void
@@ -18,7 +16,8 @@ handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
     buf[*pos] = ch;
     (*counter)++;
 
-    printbuf(buf, counter, pos);
+    buf[*counter] = '\0';
+    printf("%s", buf + *pos);
     (*pos)++;
 
     for (i = *pos; i < *counter; ++i)
@@ -159,9 +158,8 @@ prompt_set_text(char newdata[], char buf[], unsigned *counter, unsigned *pos)
 
   clear_prompt(pos);
 
-  strncpy(buf, newdata, BUFSIZE);
-  *counter = newdatasiz;
+  strcpy(buf, newdata);
+  printf("%s", buf);
 
-  printbuf(buf, counter, pos);
-  *pos = *counter;
+  *pos = *counter = newdatasiz;
 }

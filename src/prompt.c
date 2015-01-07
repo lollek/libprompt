@@ -20,7 +20,7 @@ prompt(const char *prompt)
 {
   struct termios oldterm;
   struct termios tmpterm;
-  char buf[BUFSIZE];
+  char buf[BUFSIZE +1];
   char *retval = NULL;
   int ch;
   unsigned chcounter = 0;
