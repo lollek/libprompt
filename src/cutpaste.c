@@ -92,3 +92,44 @@ kill_clear(void)
   }
   current_killringsize = 0;
 }
+
+void
+yank(char buf[], unsigned *counter, unsigned *pos)
+{
+  char *pastedata;
+  size_t pastedatalen;
+
+  if (root == NULL)
+    return;
+
+  pastedata = root->next->text;
+  pastedatalen = strlen(pastedata);
+  if (pastedatalen + *counter > BUFSIZE)
+  {
+    putchar('\a');
+    pastedatalen = BUFSIZE - *counter;
+  }
+
+  if (*pos != *counter)
+  {
+    unsigned i;
+
+    memmove(buf + *pos + pastedatalen, buf + *pos, *counter - *pos);
+    strncpy(buf + *pos, pastedata, pastedatalen);
+    *counter += pastedatalen;
+    buf[*counter] = '\0';
+
+    printf("%s", buf + *pos);
+    *pos += pastedatalen;
+
+    for (i = *pos; i < *counter; ++i)
+      putchar('\b');
+  }
+  else
+  {
+    strncpy(buf + *counter, pastedata, pastedatalen);
+    buf[*counter + pastedatalen] = '\0';
+    printf("%s", buf + *counter);
+    *pos = *counter = *counter + pastedatalen;
+  }
+}

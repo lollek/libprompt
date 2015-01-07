@@ -7,4 +7,7 @@ kill_line(char buf[], unsigned *counter, unsigned *pos);
 void
 kill_clear(void);
 
+void
+yank(char buf[], unsigned *counter, unsigned *pos);
+
 #endif /* PROMPT_CUTPASTE_H */
