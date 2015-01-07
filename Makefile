@@ -20,6 +20,7 @@ CFLAGS=-Wall -Wextra -Werror -pedantic -O3 -fpic
 CFLAGS+= -DBUFSIZE=$(BUFSIZE)
 CFLAGS+= -DHISTSIZEMAX=$(HISTSIZEMAX)
 CFLAGS+= -DKILLSIZEMAX=$(KILLSIZEMAX)
+LDFLAGS=
 
 LINT=cppcheck
 LINTFLAGS=--enable=all
@@ -29,7 +30,7 @@ SRCFILES=$(wildcard src/*.c src/**/*.c)
 OBJFILES=$(addsuffix .o,$(basename $(SRCFILES)))
 
 $(LIBNAME):	$(OBJFILES)
-	$(CC) -shared -o $@ $^
+	$(CC) $(LDFLAGS) -shared -o $@ $^
 
 install: $(LIBNAME)
 	cp $(LIBNAME) $(PREFIX)/lib
@@ -39,17 +40,25 @@ install: $(LIBNAME)
 	@echo "Run 'make testfile' if you want to test-link the library"
 	@echo "Note that you might need to run ldconfig first"
 
+testfile: LDFLAGS+= -lprompt
 testfile:	$(LIBNAME) test/main.o
-	$(CC) -lprompt -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 debug: CFLAGS+= -g -DDEBUG
+debug: LDFLAGS+= -L. -lprompt
 debug: $(LIBNAME) test/main.o
-	$(CC) -L. -lprompt -o $@ $^
-	LD_LIBRARY_PATH=. ./$@
+	$(CC) $(LDFLAGS) -o debug $^
+	LD_LIBRARY_PATH=. ./debug
 
-debugmem: CFLAGS+= -g -DDEBUG
+debugmem: CFLAGS+= -g -DDEBUG -fsanitize=address -fno-omit-frame-pointer
+debugmem: LDFLAGS+= -fsanitize=address
 debugmem: $(OBJFILES) test/main.o
-	$(CC) -o debug $^
+	$(CC) $(LDFLAGS) -o debug $^
+	./debug
+
+debugheap: CFLAGS+= -g -DDEBUG
+debugheap: $(OBJFILES) test/main.o
+	$(CC) $(LDFLAGS) -o debug $^
 	valgrind ./debug
 
 lint:
