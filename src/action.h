@@ -20,6 +20,9 @@ void
 clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt);
 
 void
+clear_prompt(unsigned *pos);
+
+void
 delete_char(char buf[], unsigned *counter, unsigned *pos);
 
 void
