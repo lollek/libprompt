@@ -11,11 +11,19 @@ handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
     putchar('\a');
   else if (*pos != *counter)
   {
+    char tmp;
     unsigned i;
     memmove(buf + *pos +1, buf + *pos, *counter - *pos);
     buf[*pos] = ch;
-    buf[*counter + 1] = '\0';
+
+    /* buf can be BUFSIZE large, and is usually not null-terminated, so we need
+     * to do some switcheroo to write all characters */
+    tmp = buf[*counter];
+    buf[*counter] = '\0';
     printf("%s", buf + *pos);
+    putchar(tmp);
+    buf[*counter] = tmp;
+
     for (i = *pos; i < *counter; ++i)
       putchar('\b');
     (*counter)++;
