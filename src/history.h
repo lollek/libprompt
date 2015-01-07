@@ -11,7 +11,7 @@ void
 history_next_cmd(char buf[], unsigned *counter, unsigned *pos);
 
 void
-history_delete(void);
+history_clear(void);
 
 void
 history_first_cmd(char buf[], unsigned *counter, unsigned *pos);

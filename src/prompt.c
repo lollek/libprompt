@@ -116,6 +116,6 @@ break_loop:
 void
 prompt_free(void)
 {
-  history_delete();
+  history_clear();
   kill_clear();
 }

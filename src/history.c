@@ -128,7 +128,7 @@ history_next_cmd(char buf[], unsigned *counter, unsigned *pos)
 }
 
 void
-history_delete(void)
+history_clear(void)
 {
   while (root != NULL)
   {
