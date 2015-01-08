@@ -60,12 +60,11 @@ backward_delete_char(char buf[], unsigned *counter, unsigned *pos)
 void
 backward_word(char buf[], unsigned *pos)
 {
-  while (*pos > 0)
-  {
+  if (*pos == 0)
+    return;
+  do
     backward_char(pos);
-    if (isalnum(buf[*pos]) && !isalnum(buf[*pos -1]))
-      return;
-  }
+  while (*pos > 0 && (!isalnum(buf[*pos]) || isalnum(buf[*pos -1])));
 }
 
 void
