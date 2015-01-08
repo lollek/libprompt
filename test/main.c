@@ -1,7 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../src/prompt.h"
+#ifdef DEBUG
+#  include "../src/prompt.h"
+#else
+#  include <prompt.h>
+#endif
 
 int main(void)
 {
