@@ -165,3 +165,33 @@ backward_kill_line(char buf[], unsigned *counter, unsigned *pos)
     kill_unshift_oldest();
   kill_push_new(tempbuf);
 }
+
+void
+kill_word(char buf[], unsigned *counter, unsigned *pos)
+{
+  char tempbuf[BUFSIZE +1];
+  unsigned cut_from = *pos;
+
+  if (*pos == *counter)
+    return;
+  if (root == NULL && kill_init_root() != 0)
+    return;
+
+  forward_word(buf, counter, pos);
+  memcpy(tempbuf, buf + cut_from, *pos - cut_from);
+  tempbuf[*pos - cut_from] = '\0';
+
+  memmove(buf + cut_from, buf + *pos, *counter - *pos);
+  *counter -= *pos - cut_from;
+  buf[*counter] = '\0';
+
+  while (*pos > cut_from)
+    backward_char(pos);
+  printf("%s\033[J\033[K", buf);
+  for (*pos = *counter; *pos > cut_from; backward_char(pos))
+    ;
+
+  if (current_killringsize == KILLSIZEMAX)
+    kill_unshift_oldest();
+  kill_push_new(tempbuf);
+}
