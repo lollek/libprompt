@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#include "terminal.h"
 #include "action.h"
 #include "history.h"
 #include "cutpaste.h"
@@ -14,16 +15,18 @@
 #define ESCAPE 27
 #define BACKSPACE 127
 
+#define buf terminal.buf
+#define chcounter terminal.buflen
+#define chpos terminal.cursorpos
+
 char *
 prompt(const char *prompt)
 {
   struct termios oldterm;
   struct termios tmpterm;
-  char buf[BUFSIZE +1];
+  terminal_t terminal = { {'\0'}, 0, 0 };
   char *retval = NULL;
   int ch;
-  unsigned chcounter = 0;
-  unsigned chpos = chcounter;
 
   tcgetattr(STDIN_FILENO, &oldterm);
   tmpterm = oldterm;
