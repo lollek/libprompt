@@ -11,7 +11,7 @@ handle_printables(int ch, terminal_t *term)
     putchar('\a');
   else if (term->cursorpos != term->buflen)
   {
-    char movebackbuf[BUFSIZE +1];
+    char movebackbuf[BUFSIZE];
     const char *cpyfrom = term->buf + term->cursorpos;
     char *cpyto = term->buf + term->cursorpos +1;
     const length_t cpysiz = term->buflen - term->cursorpos;
@@ -21,14 +21,12 @@ handle_printables(int ch, terminal_t *term)
     term->buflen += 1;
 
     term->buf[term->cursorpos] = ch;
-    term->buf[term->buflen] = '\0';
-    printf("%s", cpyfrom);
+    fwrite(cpyfrom, sizeof(char), cpysiz +1, stdout);
     term->cursorpos += 1;
 
     for (i = term->cursorpos; i < term->buflen ; ++i)
       movebackbuf[i - term->cursorpos] = '\b';
-    movebackbuf[i - term->cursorpos +1] = '\0';
-    printf("%s", movebackbuf);
+    fwrite(movebackbuf, sizeof(char), cpysiz, stdout);
   }
   else
   {
