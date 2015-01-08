@@ -1,8 +1,10 @@
 #ifndef PROMPT_ACTION_H
 #define PROMPT_ACTION_H
 
+#include "terminal.h"
+
 void
-handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos);
+handle_printables(int ch, terminal_t *term);
 
 void
 backward_delete_char(char buf[], unsigned *counter, unsigned *pos);

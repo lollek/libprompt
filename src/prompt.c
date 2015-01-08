@@ -44,7 +44,7 @@ prompt(const char *prompt)
       break;
 
     else if (isprint(ch))
-      handle_printables(ch, buf, &chcounter, &chpos);
+      handle_printables(ch, &terminal);
 
     else if (ch == ESCAPE)
     {

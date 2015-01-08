@@ -5,30 +5,37 @@
 #include "action.h"
 
 void
-handle_printables(int ch, char buf[], unsigned *counter, unsigned *pos)
+handle_printables(int ch, terminal_t *term)
 {
-  if (*counter == BUFSIZE)
+  if (term->buflen == BUFSIZE)
     putchar('\a');
-  else if (*pos != *counter)
+  else if (term->cursorpos != term->buflen)
   {
-    unsigned i;
-    memmove(buf + *pos +1, buf + *pos, *counter - *pos);
-    buf[*pos] = ch;
-    (*counter)++;
+    char movebackbuf[BUFSIZE +1];
+    const char *cpyfrom = term->buf + term->cursorpos;
+    char *cpyto = term->buf + term->cursorpos +1;
+    const length_t cpysiz = term->buflen - term->cursorpos;
+    length_t i;
 
-    buf[*counter] = '\0';
-    printf("%s", buf + *pos);
-    (*pos)++;
+    memmove(cpyto, cpyfrom, cpysiz);
+    term->buflen += 1;
 
-    for (i = *pos; i < *counter; ++i)
-      putchar('\b');
+    term->buf[term->cursorpos] = ch;
+    term->buf[term->buflen] = '\0';
+    printf("%s", cpyfrom);
+    term->cursorpos += 1;
+
+    for (i = term->cursorpos; i < term->buflen ; ++i)
+      movebackbuf[i - term->cursorpos] = '\b';
+    movebackbuf[i - term->cursorpos +1] = '\0';
+    printf("%s", movebackbuf);
   }
   else
   {
     putchar(ch);
-    buf[*pos] = ch;
-    (*counter)++;
-    (*pos)++;
+    term->buf[term->cursorpos] = ch;
+    term->cursorpos += 1;
+    term->buflen += 1;
   }
 }
 
