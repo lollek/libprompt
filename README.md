@@ -17,6 +17,7 @@ libprompt aims to be a lite version of libreadline, or more specifically, readli
 * backward-delete-char (backspace) - Delete character to the left of the current position.
 * kill-line (C-k) - Kill from cursor to the end of the prompt and put it in the kill-ring.
 * yank (C-y) - Yank the top of the kill-ring and put it at the cursor.
+* backward-kill-line (C-u) - Kill from cursor to the start of the prompt and put it in the kill-ring.
 
 ### History
 * previous-command (C-p, arrow up) - Show previous entered command.
@@ -26,7 +27,6 @@ libprompt aims to be a lite version of libreadline, or more specifically, readli
 
 ## To be implemented
 ### Editing
-* backward-kill-line (C-u) - Kill from cursor to the start of the prompt and put it in the kill-ring.
 * kill-word (M-d) - Kill from cursor to the end of the current word.
 * yank-pop (M-y) - Rotate the kill-ring to show some less recent data. Only works after yank or yank-pop.
 * repeat-char (M-0..9) - Type a number and then press a character, to show that many characters. E.g M-1,0,c will output 10 c's

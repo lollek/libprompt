@@ -87,6 +87,7 @@ prompt(const char *prompt)
       case CTRL('N'): history_next_cmd(buf, &chcounter, &chpos); break;
       case CTRL('P'): history_prev_cmd(buf, &chcounter, &chpos); break;
       case CTRL('Y'): yank(buf, &chcounter, &chpos); break;
+      case CTRL('U'): backward_kill_line(buf, &chcounter, &chpos); break;
 #ifdef DEBUG
       default: printf("%d", ch); break;
 #endif

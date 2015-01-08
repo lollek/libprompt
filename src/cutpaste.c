@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "action.h"
+
 #include "cutpaste.h"
 
 typedef struct ll
@@ -132,4 +134,34 @@ yank(char buf[], unsigned *counter, unsigned *pos)
     printf("%s", buf + *counter);
     *pos = *counter = *counter + pastedatalen;
   }
+}
+
+void
+backward_kill_line(char buf[], unsigned *counter, unsigned *pos)
+{
+  char tempbuf[BUFSIZE +1];
+  if (*pos == 0)
+  {
+    putchar('\a');
+    return;
+  }
+
+  if (root == NULL && kill_init_root() != 0)
+    return;
+
+  memcpy(tempbuf, buf, *pos);
+  tempbuf[*pos] = '\0';
+
+  memmove(buf, buf + *pos, *pos);
+  *counter -= *pos;
+  clear_prompt(pos);
+
+  buf[*counter] = '\0';
+  printf("%s", buf);
+  *pos = *counter;
+  beginning_of_line(pos);
+
+  if (current_killringsize == KILLSIZEMAX)
+    kill_unshift_oldest();
+  kill_push_new(tempbuf);
 }
