@@ -46,28 +46,30 @@ kill_unshift_oldest(void)
 }
 
 static void
-kill_push_new(char text[])
+kill_push_new(char text[], size_t length)
 {
   textlink_t *new = malloc(sizeof *new);
   if (new == NULL)
     return;
 
   new->next = root->next;
-  new->text = strdup(text);
+  new->text = malloc(length +1);
   if (new->text == NULL)
   {
     free(new);
     return;
   }
+  memcpy(new->text, text, length);
+  new->text[length] = 0;
 
   root->next = new;
   current_killringsize++;
 }
 
 void
-kill_line(char buf[], unsigned *counter, unsigned *pos)
+kill_line(terminal_t *term)
 {
-  if (*counter == *pos)
+  if (term->cursorpos == term->buflen)
     return;
   if (root == NULL && kill_init_root() != 0)
     return;
@@ -75,11 +77,9 @@ kill_line(char buf[], unsigned *counter, unsigned *pos)
   if (current_killringsize == KILLSIZEMAX)
     kill_unshift_oldest();
 
-  buf[*counter] = '\0';
-  kill_push_new(buf + *pos);
-
-  *counter = *pos;
-  printf("\033[K\033[J");
+  kill_push_new(term->buf + term->cursorpos, term->buflen - term->cursorpos);
+  term->buflen = term->cursorpos;
+  fwrite("\033[K\033[J", sizeof(char), sizeof("\033[K\033[J"), stdout);
 }
 
 void
@@ -137,10 +137,11 @@ yank(char buf[], unsigned *counter, unsigned *pos)
 }
 
 void
-backward_kill_line(char buf[], unsigned *counter, unsigned *pos)
+backward_kill_line(terminal_t *term)
 {
-  char tempbuf[BUFSIZE +1];
-  if (*pos == 0)
+  char tempbuf[BUFSIZE];
+  length_t tempbufsiz;
+  if (term->cursorpos == 0)
   {
     putchar('\a');
     return;
@@ -149,49 +150,52 @@ backward_kill_line(char buf[], unsigned *counter, unsigned *pos)
   if (root == NULL && kill_init_root() != 0)
     return;
 
-  memcpy(tempbuf, buf, *pos);
-  tempbuf[*pos] = '\0';
+  memcpy(tempbuf, term->buf, term->cursorpos);
+  tempbufsiz = term->cursorpos;
+  memmove(term->buf, term->buf + term->cursorpos,
+          term->buflen - term->cursorpos);
 
-  memmove(buf, buf + *pos, *pos);
-  *counter -= *pos;
-  clear_prompt(pos);
+  term->buflen -= term->cursorpos;
+  clear_prompt(&term->cursorpos);
 
-  buf[*counter] = '\0';
-  printf("%s", buf);
-  *pos = *counter;
-  beginning_of_line(pos);
+  fwrite(term->buf, sizeof(char), term->buflen, stdout);
+  term->cursorpos = term->buflen;
+  beginning_of_line(&term->cursorpos);
 
   if (current_killringsize == KILLSIZEMAX)
     kill_unshift_oldest();
-  kill_push_new(tempbuf);
+  kill_push_new(tempbuf, tempbufsiz);
 }
 
 void
-kill_word(char buf[], unsigned *counter, unsigned *pos)
+kill_word(terminal_t *term)
 {
-  char tempbuf[BUFSIZE +1];
-  unsigned cut_from = *pos;
+  char tempbuf[BUFSIZE];
+  size_t tempbufsiz;
+  unsigned cut_from = term->cursorpos;
 
-  if (*pos == *counter)
+  if (term->cursorpos == term->buflen)
     return;
   if (root == NULL && kill_init_root() != 0)
     return;
 
-  forward_word(buf, counter, pos);
-  memcpy(tempbuf, buf + cut_from, *pos - cut_from);
-  tempbuf[*pos - cut_from] = '\0';
+  forward_word(term);
+  tempbufsiz = term->cursorpos - cut_from;
+  memcpy(tempbuf, term->buf + cut_from, tempbufsiz);
+  memmove(term->buf + cut_from, term->buf + term->cursorpos,
+          term->buflen - term->cursorpos);
+  term->buflen -= term->cursorpos - cut_from;
 
-  memmove(buf + cut_from, buf + *pos, *counter - *pos);
-  *counter -= *pos - cut_from;
-  buf[*counter] = '\0';
+  while (term->cursorpos > cut_from)
+    backward_char(&term->cursorpos);
+  fwrite(term->buf, sizeof(char), term->buflen, stdout);
+  fwrite("\033[J\033[K", sizeof(char), sizeof("\033[J\033[K"), stdout);
 
-  while (*pos > cut_from)
-    backward_char(pos);
-  printf("%s\033[J\033[K", buf);
-  for (*pos = *counter; *pos > cut_from; backward_char(pos))
-    ;
+  term->cursorpos = term->buflen;
+  while (term->cursorpos > cut_from)
+    backward_char(&term->cursorpos);
 
   if (current_killringsize == KILLSIZEMAX)
     kill_unshift_oldest();
-  kill_push_new(tempbuf);
+  kill_push_new(tempbuf, tempbufsiz);
 }

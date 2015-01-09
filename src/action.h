@@ -7,7 +7,7 @@ void
 handle_printables(int ch, terminal_t *term);
 
 void
-backward_delete_char(char buf[], unsigned *counter, unsigned *pos);
+backward_delete_char(terminal_t *term);
 
 void
 backward_word(char buf[], unsigned *pos);
@@ -25,16 +25,16 @@ void
 clear_prompt(unsigned *pos);
 
 void
-delete_char(char buf[], unsigned *counter, unsigned *pos);
+delete_char(terminal_t *term);
 
 void
-end_of_line(char buf[], unsigned *counter, unsigned *pos);
+end_of_line(terminal_t *term);
 
 int
-forward_char(char buf[], unsigned *counter, unsigned *pos);
+forward_char(terminal_t *term);
 
 void
-forward_word(char buf[], unsigned *counter, unsigned *pos);
+forward_word(terminal_t *term);
 
 void
 prompt_set_text(char newdata[], char buf[], unsigned *counter, unsigned *pos);

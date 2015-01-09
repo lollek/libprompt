@@ -38,27 +38,44 @@ handle_printables(int ch, terminal_t *term)
 }
 
 void
-backward_delete_char(char buf[], unsigned *counter, unsigned *pos)
+backward_delete_char(terminal_t *term)
 {
-  if (*pos == 0)
+  if (term->cursorpos == 0)
     putchar('\a');
-  else if (*pos == *counter)
+  else if (term->cursorpos == term->buflen)
   {
-    printf("\b \b");
-    (*counter)--;
-    (*pos)--;
+    fwrite("\b \b", sizeof(char), 3, stdout);
+    term->cursorpos -= 1;
+    term->buflen -= 1;
   }
   else
   {
-    unsigned i;
-    memmove(buf + *pos -1, buf + *pos, *counter - *pos);
-    (*counter)--;
-    (*pos)--;
+    char outbuf[BUFSIZE * 3];
+    char *outbufpos = outbuf;
+    length_t i;
 
-    buf[*counter] = '\0';
-    printf("\b%s \b", buf + *pos);
-    for (i = *pos; i < *counter; ++i)
-      putchar('\b');
+    memmove(term->buf + term->cursorpos -1, term->buf + term->cursorpos,
+            term->buflen - term->cursorpos);
+    term->buflen -= 1;
+    term->cursorpos -= 1;
+
+    *outbufpos = '\b';
+    outbufpos++;
+
+    memcpy(outbufpos, term->buf + term->cursorpos,
+           term->buflen - term->cursorpos);
+    outbufpos += term->buflen - term->cursorpos;
+
+    memcpy(outbufpos, " \b", 2);
+    outbufpos += 2;
+
+    for (i = term->cursorpos; i < term->buflen; ++i)
+    {
+      *outbufpos = '\b';
+      outbufpos++;
+    }
+
+    fwrite(outbuf, sizeof(char), outbufpos - outbuf, stdout);
   }
 }
 
@@ -115,26 +132,25 @@ clear_prompt(unsigned *pos)
 }
 
 void
-delete_char(char buf[], unsigned *counter, unsigned *pos)
+delete_char(terminal_t *term)
 {
-  if (forward_char(buf, counter, pos) == 0)
-    backward_delete_char(buf, counter, pos);
+  if (forward_char(term) == 0)
+    backward_delete_char(term);
 }
 
 void
-end_of_line(char buf[], unsigned *counter, unsigned *pos)
+end_of_line(terminal_t *term)
 {
-  while (*pos < *counter)
-    forward_char(buf, counter, pos);
+  while (term->cursorpos < term->buflen)
+    forward_char(term);
 }
 
 int
-forward_char(char buf[], unsigned *counter, unsigned *pos)
+forward_char(terminal_t *term)
 {
-  if (*pos < *counter)
+  if (term->cursorpos < term->buflen)
   {
-    putchar(buf[*pos]);
-    (*pos)++;
+    putchar(term->buf[term->cursorpos++]);
     return 0;
   }
   else
@@ -145,12 +161,13 @@ forward_char(char buf[], unsigned *counter, unsigned *pos)
 }
 
 void
-forward_word(char buf[], unsigned *counter, unsigned *pos)
+forward_word(terminal_t *term)
 {
-  while (*pos < *counter)
+  while (term->cursorpos < term->buflen)
   {
-    forward_char(buf, counter, pos);
-    if (!isalnum(buf[*pos]) && isalnum(buf[*pos -1]))
+    forward_char(term);
+    if (!isalnum(term->buf[term->cursorpos])
+        && isalnum(term->buf[term->cursorpos -1]))
       return;
   }
 }

@@ -52,8 +52,8 @@ prompt(const char *prompt)
       switch (ch)
       {
         case 'b': backward_word(buf, &chpos); break;
-        case 'f': forward_word(buf, &chcounter, &chpos); break;
-        case 'd': kill_word(buf, &chcounter, &chpos); break;
+        case 'f': forward_word(&terminal); break;
+        case 'd': kill_word(&terminal); break;
         case '<': history_first_cmd(buf, &chcounter, &chpos); break;
         case '>': history_last_cmd(buf, &chcounter, &chpos); break;
         case '[': /* ARROW KEYS */
@@ -62,7 +62,7 @@ prompt(const char *prompt)
           {
             case 'A': history_prev_cmd(buf, &chcounter, &chpos); break;
             case 'B': history_next_cmd(buf, &chcounter, &chpos); break;
-            case 'C': forward_char(buf, &chcounter, &chpos); break;
+            case 'C': forward_char(&terminal); break;
             case 'D': backward_char(&chpos); break;
             default: putchar('\a'); break;
           }
@@ -75,22 +75,22 @@ prompt(const char *prompt)
 
     else switch (ch)
     {
-      case BACKSPACE: backward_delete_char(buf, &chcounter, &chpos); break;
+      case BACKSPACE: backward_delete_char(&terminal); break;
       case CTRL('A'): beginning_of_line(&chpos); break;
       case CTRL('B'): backward_char(&chpos); break;
       case CTRL('D'): if (chcounter == 0)
                         ch = EOF;
                       else
-                        delete_char(buf, &chcounter, &chpos);
+                        delete_char(&terminal);
                       break;
-      case CTRL('E'): end_of_line(buf, &chcounter, &chpos); break;
-      case CTRL('F'): forward_char(buf, &chcounter, &chpos); break;
-      case CTRL('K'): kill_line(buf, &chcounter, &chpos); break;
+      case CTRL('E'): end_of_line(&terminal); break;
+      case CTRL('F'): forward_char(&terminal); break;
+      case CTRL('K'): kill_line(&terminal); break;
       case CTRL('L'): clear_screen(buf, &chcounter, &chpos, prompt); break;
       case CTRL('N'): history_next_cmd(buf, &chcounter, &chpos); break;
       case CTRL('P'): history_prev_cmd(buf, &chcounter, &chpos); break;
       case CTRL('Y'): yank(buf, &chcounter, &chpos); break;
-      case CTRL('U'): backward_kill_line(buf, &chcounter, &chpos); break;
+      case CTRL('U'): backward_kill_line(&terminal); break;
 #ifdef DEBUG
       default: printf("%d", ch); break;
 #endif
