@@ -41,23 +41,23 @@ install: $(LIBNAME)
 	@echo "Note that you might need to run ldconfig first"
 
 testfile: LDFLAGS+= -lprompt
-testfile:	$(LIBNAME) test/main.o
+testfile:	$(LIBNAME) tests/main.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 debug: CFLAGS+= -g -DDEBUG
 debug: LDFLAGS+= -L. -lprompt
-debug: $(LIBNAME) test/main.o
+debug: $(LIBNAME) tests/main.o
 	$(CC) $(LDFLAGS) -o debug $^
 	LD_LIBRARY_PATH=. ./debug
 
 debugmem: CFLAGS+= -g -DDEBUG -fsanitize=address -fno-omit-frame-pointer
 debugmem: LDFLAGS+= -fsanitize=address
-debugmem: $(OBJFILES) test/main.o
+debugmem: $(OBJFILES) tests/main.o
 	$(CC) $(LDFLAGS) -o debug $^
 	./debug
 
 debugheap: CFLAGS+= -g -DDEBUG
-debugheap: $(OBJFILES) test/main.o
+debugheap: $(OBJFILES) tests/main.o
 	$(CC) $(LDFLAGS) -o debug $^
 	valgrind ./debug
 
@@ -65,6 +65,6 @@ lint:
 	$(LINT) $(LINTFLAGS) $(SRCFILES) $(HEADERS)
 
 clean:
-	$(RM) $(OBJFILES) $(LIBNAME) testfile debug test/main.o
+	$(RM) $(OBJFILES) $(LIBNAME) testfile debug tests/main.o
 
 .PHONY:	clean lint testfile debug debugmem install
