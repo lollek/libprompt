@@ -111,7 +111,7 @@ backward_char(unsigned *pos)
 void
 clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt)
 {
-  printf("\033[2J\033[;H");
+  fwrite("\033[2J\033[:H", sizeof(char), sizeof("\033[2J\033[;H"), stdout);
   if (prompt != NULL)
     printf("%s", prompt);
   if (*counter != 0)
@@ -128,7 +128,7 @@ void
 clear_prompt(unsigned *pos)
 {
   beginning_of_line(pos);
-  printf("\033[K\033[J");
+  fwrite("\033[K\033[J", sizeof(char), sizeof("\033[K\033[J"), stdout);
 }
 
 void
