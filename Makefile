@@ -29,10 +29,13 @@ HEADERS=$(wildcard src/*.h)
 SRCFILES=$(wildcard src/*.c)
 OBJFILES=$(addsuffix .o,$(basename $(SRCFILES)))
 
-$(LIBNAME):	$(OBJFILES)
+TESTSRC=$(wildcard tests/test_*.c)
+TESTOBJ=$(addsuffix .o,$(basename $(TESTSRC)))
+
+$(LIBNAME): $(OBJFILES)
 	$(CC) $(LDFLAGS) -shared -o $@ $^
 
-install: $(LIBNAME)
+install:$(LIBNAME)
 	cp $(LIBNAME) $(PREFIX)/lib
 	chmod 0755 $(PREFIX)/lib/$(LIBNAME)
 	cp src/prompt.h $(PREFIX)/include
@@ -43,6 +46,11 @@ install: $(LIBNAME)
 testfile: LDFLAGS+= -lprompt
 testfile:	$(LIBNAME) tests/main.o
 	$(CC) $(LDFLAGS) -o $@ $^
+
+test: $(LIBNAME) $(TESTOBJ)
+	$(foreach test, $(TESTOBJ),\
+	  $(CC) $(LDFLAGS) -o test $(test) $(OBJFILES) && ./test;)
+	@$(RM) test
 
 debug: CFLAGS+= -g -DDEBUG
 debug: LDFLAGS+= -L. -lprompt
@@ -67,4 +75,4 @@ lint:
 clean:
 	$(RM) $(OBJFILES) $(LIBNAME) testfile debug tests/main.o
 
-.PHONY:	clean lint testfile debug debugmem install
+.PHONY:	clean lint testfile test debug debugmem install
