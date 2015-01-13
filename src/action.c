@@ -80,54 +80,60 @@ backward_delete_char(terminal_t *term)
 }
 
 void
-backward_word(char buf[], unsigned *pos)
+backward_word(terminal_t *term)
 {
-  if (*pos == 0)
+  if (term->cursorpos == 0)
     return;
   do
-    backward_char(pos);
-  while (*pos > 0 && (!isalnum(buf[*pos]) || isalnum(buf[*pos -1])));
+    backward_char(term);
+  while (term->cursorpos > 0 &&
+         (!isalnum(term->buf[term->cursorpos])
+          || isalnum(term->buf[term->cursorpos -1])));
 }
 
 void
-beginning_of_line(unsigned *pos)
+beginning_of_line(terminal_t *term)
 {
-  while (*pos > 0)
-    backward_char(pos);
+  while (term->cursorpos > 0)
+    backward_char(term);
 }
 
 void
-backward_char(unsigned *pos)
+backward_char(terminal_t *term)
 {
-  if (*pos == 0)
+  if (term->cursorpos == 0)
     putchar('\a');
   else
   {
-    printf("\b");
-    (*pos)--;
+    putchar('\b');
+    term->cursorpos -= 1;
   }
 }
 
 void
-clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt)
+clear_screen(terminal_t *term, const char *prompt)
 {
   fwrite("\033[2J\033[:H", sizeof(char), sizeof("\033[2J\033[;H"), stdout);
+
   if (prompt != NULL)
     printf("%s", prompt);
-  if (*counter != 0)
+
+  if (term->buflen != 0)
   {
+    char tmpbuf[BUFSIZE *2];
     unsigned i = 0;
-    for (i = 0; i < *counter; ++i)
-      putchar(buf[i]);
-    for (i = *counter; i > *pos; --i)
-      putchar('\b');
+    for (i = 0; i < term->buflen; ++i)
+      tmpbuf[i] = term->buf[i];
+    for (i += term->cursorpos; i - term->buflen < term->buflen; ++i)
+      tmpbuf[i - term->buflen] = term->buf[i - term->buflen];
+    fwrite(tmpbuf, sizeof(char), i, stdout);
   }
 }
 
 void
-clear_prompt(unsigned *pos)
+clear_prompt(terminal_t *term)
 {
-  beginning_of_line(pos);
+  beginning_of_line(term);
   fwrite("\033[K\033[J", sizeof(char), sizeof("\033[K\033[J"), stdout);
 }
 
@@ -173,14 +179,13 @@ forward_word(terminal_t *term)
 }
 
 void
-prompt_set_text(char newdata[], char buf[], unsigned *counter, unsigned *pos)
+prompt_set_text(char newdata[], terminal_t *term)
 {
-  const size_t newdatasiz = strlen(newdata);
+  size_t newdatasiz = strlen(newdata);
 
-  clear_prompt(pos);
+  clear_prompt(term);
 
-  strcpy(buf, newdata);
-  printf("%s", buf);
-
-  *pos = *counter = newdatasiz;
+  strcpy(term->buf, newdata);
+  fwrite(term->buf, sizeof(char), newdatasiz, stdout);
+  term->cursorpos = term->buflen = newdatasiz;
 }

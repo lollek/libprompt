@@ -10,19 +10,19 @@ void
 backward_delete_char(terminal_t *term);
 
 void
-backward_word(char buf[], unsigned *pos);
+backward_word(terminal_t *term);
 
 void
-beginning_of_line(unsigned *pos);
+beginning_of_line(terminal_t *term);
 
 void
-backward_char(unsigned *pos);
+backward_char(terminal_t *term);
 
 void
-clear_screen(char buf[], unsigned *counter, unsigned *pos, const char *prompt);
+clear_screen(terminal_t *term, const char *prompt);
 
 void
-clear_prompt(unsigned *pos);
+clear_prompt(terminal_t *term);
 
 void
 delete_char(terminal_t *term);
@@ -37,6 +37,6 @@ void
 forward_word(terminal_t *term);
 
 void
-prompt_set_text(char newdata[], char buf[], unsigned *counter, unsigned *pos);
+prompt_set_text(char newdata[], terminal_t *term);
 
 #endif /* PROMPT_ACTION_H */

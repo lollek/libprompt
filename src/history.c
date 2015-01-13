@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "action.h"
+#include "terminal.h"
 
 #include "history.h"
 
@@ -67,12 +68,18 @@ history_push_new(char *text)
 }
 
 static int
-history_save_tmpline(char text[])
+history_save_tmpline(terminal_t *term)
 {
   if (tmpline != NULL)
     free(tmpline);
-  tmpline = strdup(text);
-  return tmpline ? 0 : 1;
+
+  tmpline = malloc(term->buflen +1);
+  if (tmpline == NULL)
+    return 1;
+
+  memcpy(tmpline, term->buf, term->buflen);
+  tmpline[term->buflen] = '\0';
+  return 0;
 }
 
 void
@@ -93,7 +100,7 @@ history_save(char *text)
 }
 
 void
-history_prev_cmd(char buf[], unsigned *counter, unsigned *pos)
+history_prev_cmd(terminal_t *term)
 {
   if (root == NULL || current == root)
   {
@@ -101,19 +108,15 @@ history_prev_cmd(char buf[], unsigned *counter, unsigned *pos)
     return;
   }
 
-  if (current->next == NULL)
-  {
-    buf[*counter] = '\0';
-    if (history_save_tmpline(buf) != 0)
-      return;
-  }
+  if (current->next == NULL && history_save_tmpline(term) != 0)
+    return;
 
-  prompt_set_text(current->text, buf, counter, pos);
+  prompt_set_text(current->text, term);
   current = current->prev;
 }
 
 void
-history_next_cmd(char buf[], unsigned *counter, unsigned *pos)
+history_next_cmd(terminal_t *term)
 {
   if (root == NULL || current->next == NULL)
   {
@@ -122,9 +125,7 @@ history_next_cmd(char buf[], unsigned *counter, unsigned *pos)
   }
 
   current = current->next;
-  prompt_set_text(current->next ? current->next->text : tmpline,
-                  buf, counter, pos);
-
+  prompt_set_text(current->next ? current->next->text : tmpline, term);
 }
 
 void
@@ -150,7 +151,7 @@ history_clear(void)
 }
 
 void
-history_first_cmd(char buf[], unsigned *counter, unsigned *pos)
+history_first_cmd(terminal_t *term)
 {
   if (root == NULL || current == root)
   {
@@ -158,19 +159,15 @@ history_first_cmd(char buf[], unsigned *counter, unsigned *pos)
     return;
   }
 
-  if (current->next == NULL)
-  {
-    buf[*counter] = '\0';
-    if (history_save_tmpline(buf) != 0)
-      return;
-  }
+  if (current->next == NULL && history_save_tmpline(term) != 0)
+    return;
 
   current = root;
-  prompt_set_text(current->next->text, buf, counter, pos);
+  prompt_set_text(current->next->text, term);
 }
 
 void
-history_last_cmd(char buf[], unsigned *counter, unsigned *pos)
+history_last_cmd(terminal_t *term)
 {
   if (root == NULL || current->next == NULL)
   {
@@ -180,5 +177,5 @@ history_last_cmd(char buf[], unsigned *counter, unsigned *pos)
 
   while (current->next != NULL)
     current = current->next;
-  prompt_set_text(tmpline, buf, counter, pos);
+  prompt_set_text(tmpline, term);
 }

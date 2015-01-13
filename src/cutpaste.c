@@ -96,7 +96,7 @@ kill_clear(void)
 }
 
 void
-yank(char buf[], unsigned *counter, unsigned *pos)
+yank(terminal_t *term)
 {
   char *pastedata;
   size_t pastedatalen;
@@ -106,33 +106,33 @@ yank(char buf[], unsigned *counter, unsigned *pos)
 
   pastedata = root->next->text;
   pastedatalen = strlen(pastedata);
-  if (pastedatalen + *counter > BUFSIZE)
+  if (pastedatalen + term->buflen > BUFSIZE)
   {
     putchar('\a');
-    pastedatalen = BUFSIZE - *counter;
+    pastedatalen = BUFSIZE - term->buflen;
   }
 
-  if (*pos != *counter)
+  if (term->cursorpos != term->buflen)
   {
     unsigned i;
 
-    memmove(buf + *pos + pastedatalen, buf + *pos, *counter - *pos);
-    strncpy(buf + *pos, pastedata, pastedatalen);
-    *counter += pastedatalen;
-    buf[*counter] = '\0';
+    memmove(term->buf + term->cursorpos + pastedatalen,
+            term->buf + term->cursorpos, term->buflen - term->cursorpos);
+    memcpy(term->buf + term->cursorpos, pastedata, pastedatalen);
+    term->buflen += pastedatalen;
 
-    printf("%s", buf + *pos);
-    *pos += pastedatalen;
+    fwrite(term->buf + term->cursorpos, sizeof(char),
+           term->buflen - term->cursorpos, stdout);
+    term->cursorpos += pastedatalen;
 
-    for (i = *pos; i < *counter; ++i)
+    for (i = term->cursorpos; i < term->buflen; ++i)
       putchar('\b');
   }
   else
   {
-    strncpy(buf + *counter, pastedata, pastedatalen);
-    buf[*counter + pastedatalen] = '\0';
-    printf("%s", buf + *counter);
-    *pos = *counter = *counter + pastedatalen;
+    memcpy(term->buf + term->buflen, pastedata, pastedatalen);
+    fwrite(term->buf + term->cursorpos, sizeof(char), pastedatalen, stdout);
+    term->cursorpos = term->buflen = term->buflen + pastedatalen;
   }
 }
 
@@ -156,11 +156,11 @@ backward_kill_line(terminal_t *term)
           term->buflen - term->cursorpos);
 
   term->buflen -= term->cursorpos;
-  clear_prompt(&term->cursorpos);
+  clear_prompt(term);
 
   fwrite(term->buf, sizeof(char), term->buflen, stdout);
   term->cursorpos = term->buflen;
-  beginning_of_line(&term->cursorpos);
+  beginning_of_line(term);
 
   if (current_killringsize == KILLSIZEMAX)
     kill_unshift_oldest();
@@ -187,13 +187,13 @@ kill_word(terminal_t *term)
   term->buflen -= term->cursorpos - cut_from;
 
   while (term->cursorpos > cut_from)
-    backward_char(&term->cursorpos);
+    backward_char(term);
   fwrite(term->buf, sizeof(char), term->buflen, stdout);
   fwrite("\033[J\033[K", sizeof(char), sizeof("\033[J\033[K"), stdout);
 
   term->cursorpos = term->buflen;
   while (term->cursorpos > cut_from)
-    backward_char(&term->cursorpos);
+    backward_char(term);
 
   if (current_killringsize == KILLSIZEMAX)
     kill_unshift_oldest();

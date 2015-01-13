@@ -5,18 +5,18 @@ void
 history_save(char *text);
 
 void
-history_prev_cmd(char buf[], unsigned *counter, unsigned *pos);
+history_prev_cmd(terminal_t *term);
 
 void
-history_next_cmd(char buf[], unsigned *counter, unsigned *pos);
+history_next_cmd(terminal_t *term);
 
 void
 history_clear(void);
 
 void
-history_first_cmd(char buf[], unsigned *counter, unsigned *pos);
+history_first_cmd(terminal_t *term);
 
 void
-history_last_cmd(char buf[], unsigned *counter, unsigned *pos);
+history_last_cmd(terminal_t *term);
 
 #endif /* PROMPT_HISTORY_H */

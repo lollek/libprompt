@@ -15,10 +15,6 @@
 #define ESCAPE 27
 #define BACKSPACE 127
 
-#define buf terminal.buf
-#define chcounter terminal.buflen
-#define chpos terminal.cursorpos
-
 char *
 prompt(const char *prompt)
 {
@@ -51,19 +47,19 @@ prompt(const char *prompt)
       ch = getchar();
       switch (ch)
       {
-        case 'b': backward_word(buf, &chpos); break;
+        case 'b': backward_word(&terminal); break;
         case 'f': forward_word(&terminal); break;
         case 'd': kill_word(&terminal); break;
-        case '<': history_first_cmd(buf, &chcounter, &chpos); break;
-        case '>': history_last_cmd(buf, &chcounter, &chpos); break;
+        case '<': history_first_cmd(&terminal); break;
+        case '>': history_last_cmd(&terminal); break;
         case '[': /* ARROW KEYS */
           ch = getchar();
           switch (ch)
           {
-            case 'A': history_prev_cmd(buf, &chcounter, &chpos); break;
-            case 'B': history_next_cmd(buf, &chcounter, &chpos); break;
+            case 'A': history_prev_cmd(&terminal); break;
+            case 'B': history_next_cmd(&terminal); break;
             case 'C': forward_char(&terminal); break;
-            case 'D': backward_char(&chpos); break;
+            case 'D': backward_char(&terminal); break;
             default: putchar('\a'); break;
           }
           break;
@@ -76,9 +72,9 @@ prompt(const char *prompt)
     else switch (ch)
     {
       case BACKSPACE: backward_delete_char(&terminal); break;
-      case CTRL('A'): beginning_of_line(&chpos); break;
-      case CTRL('B'): backward_char(&chpos); break;
-      case CTRL('D'): if (chcounter == 0)
+      case CTRL('A'): beginning_of_line(&terminal); break;
+      case CTRL('B'): backward_char(&terminal); break;
+      case CTRL('D'): if (terminal.buflen == 0)
                         ch = EOF;
                       else
                         delete_char(&terminal);
@@ -86,10 +82,10 @@ prompt(const char *prompt)
       case CTRL('E'): end_of_line(&terminal); break;
       case CTRL('F'): forward_char(&terminal); break;
       case CTRL('K'): kill_line(&terminal); break;
-      case CTRL('L'): clear_screen(buf, &chcounter, &chpos, prompt); break;
-      case CTRL('N'): history_next_cmd(buf, &chcounter, &chpos); break;
-      case CTRL('P'): history_prev_cmd(buf, &chcounter, &chpos); break;
-      case CTRL('Y'): yank(buf, &chcounter, &chpos); break;
+      case CTRL('L'): clear_screen(&terminal, prompt); break;
+      case CTRL('N'): history_next_cmd(&terminal); break;
+      case CTRL('P'): history_prev_cmd(&terminal); break;
+      case CTRL('Y'): yank(&terminal); break;
       case CTRL('U'): backward_kill_line(&terminal); break;
 #ifdef DEBUG
       default: printf("%d", ch); break;
@@ -101,15 +97,15 @@ prompt(const char *prompt)
 
   tcsetattr(STDIN_FILENO, TCSANOW, &oldterm);
 
-  if (ch == EOF && chcounter == 0)
+  if (ch == EOF && terminal.buflen == 0)
     return NULL;
 
-  retval = malloc(chcounter + 1);
+  retval = malloc(terminal.buflen + 1);
   if (retval == NULL)
     return NULL;
 
-  memcpy(retval, buf, chcounter);
-  retval[chcounter] = '\0';
+  memcpy(retval, terminal.buf, terminal.buflen);
+  retval[terminal.buflen] = '\0';
 
   if (retval[0] != '\0')
     history_save(retval);

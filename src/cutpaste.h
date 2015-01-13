@@ -10,7 +10,7 @@ void
 kill_clear(void);
 
 void
-yank(char buf[], unsigned *counter, unsigned *pos);
+yank(terminal_t *term);
 
 void
 backward_kill_line(terminal_t *term);
