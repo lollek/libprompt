@@ -47,6 +47,8 @@ testfile: LDFLAGS+= -lprompt
 testfile:	$(LIBNAME) tests/main.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
+test: CFLAGS += -g -fsanitize=address -fno-omit-frame-pointer
+test: LDFLAGS+= -fsanitize=address
 test: $(LIBNAME) $(TESTOBJ)
 	$(foreach test, $(TESTOBJ),\
 	  $(CC) $(LDFLAGS) -o test $(test) $(OBJFILES) && ./test;)
