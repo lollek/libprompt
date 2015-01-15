@@ -11,12 +11,12 @@ int main(void)
 {
   for (;;)
   {
-    char *line = prompt("> ");
+    char buf[PROMPT_BUF_SIZE];
+    char *line = prompt_r("> ", buf);
     if (line == NULL)
       break;
 
     printf("You wrote '%s'\n", line);
-    free(line);
   }
 
   prompt_free();

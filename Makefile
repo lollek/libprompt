@@ -36,9 +36,9 @@ $(LIBNAME): $(OBJFILES)
 	$(CC) $(LDFLAGS) -shared -o $@ $^
 
 install:$(LIBNAME)
-	cp $(LIBNAME) $(PREFIX)/lib
+	cp $(LIBNAME) $(PREFIX)/lib/$(LIBNAME)
 	chmod 0755 $(PREFIX)/lib/$(LIBNAME)
-	cp src/prompt.h $(PREFIX)/include
+	sed 's/BUFSIZE/$(BUFSIZE)/g' src/prompt.h > $(PREFIX)/include/prompt.h
 	@echo
 	@echo "Run 'make testfile' if you want to test-link the library"
 	@echo "Note that you might need to run ldconfig first"

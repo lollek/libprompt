@@ -17,6 +17,8 @@
 #ifndef PROMPT_PROMPT_H
 #define PROMPT_PROMPT_H
 
+#define PROMPT_BUF_SIZE BUFSIZE +1
+
 /**
  * prompt - read a line from the user
  * @prompt	string to write as a prompt. NULL means no prompt.
@@ -24,8 +26,21 @@
  * The line returned is allocated with malloc, so it must be freed when
  * no longer needed. The newline at the end of the string is removed.
  */
-char
-*prompt(const char *prompt);
+char *
+prompt(const char *prompt);
+
+/**
+ * prompt_r - read a line from the user
+ * @prompt	string to write as a prompt. NULL means no prompt
+ * @buffer	buffer to store the return string in. Needs to be able to store
+ * 		PROMPT_BUF_SIZE characters
+ *
+ * prompt_r works like prompt except that instead of returning a char array
+ * stored on the heap, it stores the data in @buffer and returns a reference to
+ * it
+ */
+char *
+prompt_r(const char *prompt, char *buffer);
 
 
 /**

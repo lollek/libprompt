@@ -18,10 +18,15 @@
 char *
 prompt(const char *prompt)
 {
+  return prompt_r(prompt, NULL);
+}
+
+char *
+prompt_r(const char *prompt, char *buffer)
+{
   struct termios oldterm;
   struct termios tmpterm;
   terminal_t terminal = { {'\0'}, 0, 0 };
-  char *retval = NULL;
   int ch;
 
   tcgetattr(STDIN_FILENO, &oldterm);
@@ -100,17 +105,20 @@ prompt(const char *prompt)
   if (ch == EOF && terminal.buflen == 0)
     return NULL;
 
-  retval = malloc(terminal.buflen + 1);
-  if (retval == NULL)
-    return NULL;
+  if (buffer == NULL)
+  {
+    buffer = malloc(terminal.buflen + 1);
+    if (buffer == NULL)
+      return NULL;
+  }
 
-  memcpy(retval, terminal.buf, terminal.buflen);
-  retval[terminal.buflen] = '\0';
+  memcpy(buffer, terminal.buf, terminal.buflen);
+  buffer[terminal.buflen] = '\0';
 
-  if (retval[0] != '\0')
-    history_save(retval);
+  if (buffer[0] != '\0')
+    history_save(buffer);
 
-  return retval;
+  return buffer;
 }
 
 void
