@@ -8,6 +8,8 @@
 
 void test_handle_printables(terminal_t *term)
 {
+  printf("[prompt]");
+
   /* Test print 1 char on empty term */
   handle_printables('a', term);
   assert(term->buf[0] == 'a');

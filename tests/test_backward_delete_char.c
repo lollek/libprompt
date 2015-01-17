@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include <assert.h>
 
 #include "../src/terminal.h"
@@ -7,6 +8,8 @@
 
 void test_backward_delete_char(terminal_t *term)
 {
+  printf("[prompt]");
+
   handle_printables('h', term);
   handle_printables('i', term);
   assert(term->buf[0] == 'h');
