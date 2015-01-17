@@ -15,6 +15,12 @@ HISTSIZEMAX=100
 KILLSIZEMAX=10
 ###
 
+# Set \n to newline
+define \n
+
+
+endef
+
 LIBNAME=libprompt.so
 CFLAGS=-Wall -Wextra -Werror -pedantic -O3 -fpic
 CFLAGS+= -DBUFSIZE=$(BUFSIZE)
@@ -51,7 +57,7 @@ test: CFLAGS += -g -fsanitize=address -fno-omit-frame-pointer
 test: LDFLAGS+= -fsanitize=address
 test: $(LIBNAME) $(TESTOBJ)
 	$(foreach test, $(TESTOBJ),\
-	  $(CC) $(LDFLAGS) -o test $(test) $(OBJFILES) && ./test;)
+	  $(CC) $(LDFLAGS) -o test $(test) $(OBJFILES) && ./test${\n})
 	@$(RM) test
 
 debug: CFLAGS+= -g -DDEBUG
