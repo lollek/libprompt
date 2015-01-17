@@ -75,6 +75,6 @@ lint:
 	$(LINT) $(LINTFLAGS) $(SRCFILES) $(HEADERS)
 
 clean:
-	$(RM) $(OBJFILES) $(LIBNAME) testfile debug tests/main.o
+	$(RM) $(OBJFILES) $(TESTOBJ) $(LIBNAME) testfile debug tests/main.o
 
 .PHONY:	clean lint testfile test debug debugmem install
