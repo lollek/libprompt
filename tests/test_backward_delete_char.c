@@ -89,5 +89,6 @@ int main(void)
   test_backward_delete_char(&term);
 
   kill_line(&term);
+  putchar('\n');
   return 0;
 }

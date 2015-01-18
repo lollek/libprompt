@@ -102,6 +102,7 @@ int main(void)
 
   beginning_of_line(&term);
   kill_line(&term);
+  putchar('\n');
 
   return 0;
 }
