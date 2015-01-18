@@ -5,7 +5,7 @@
 #include "action.h"
 
 void
-printc(int ch, terminal_t *term)
+printc(char ch, terminal_t *term)
 {
   if (term->buflen == BUFSIZE)
     putchar('\a');
