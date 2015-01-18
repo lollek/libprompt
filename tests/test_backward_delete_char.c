@@ -10,8 +10,8 @@ void test_backward_delete_char(terminal_t *term)
 {
   printf("[prompt]");
 
-  handle_printables('h', term);
-  handle_printables('i', term);
+  printc('h', term);
+  printc('i', term);
   assert(term->buf[0] == 'h');
   assert(term->buf[1] == 'i');
   assert(term->buflen == 2);
@@ -35,8 +35,8 @@ void test_backward_delete_char(terminal_t *term)
   /* Should work when buffer is maxed */
   term->cursorpos = term->buflen;
   while (term->buflen < BUFSIZE -1)
-    handle_printables('0', term);
-  handle_printables('9', term);
+    printc('0', term);
+  printc('9', term);
 
   assert(term->buflen == BUFSIZE);
   assert(term->cursorpos == BUFSIZE);
@@ -53,10 +53,10 @@ void test_backward_delete_char(terminal_t *term)
   while (term->cursorpos > 2)
     backward_char(term);
   term->buflen -= 4;
-  handle_printables('1', term);
-  handle_printables('2', term);
-  handle_printables('3', term);
-  handle_printables('4', term);
+  printc('1', term);
+  printc('2', term);
+  printc('3', term);
+  printc('4', term);
 
   assert(term->buf[2] == '1');
   assert(term->buf[3] == '2');

@@ -5,7 +5,7 @@
 #include "action.h"
 
 void
-handle_printables(int ch, terminal_t *term)
+printc(int ch, terminal_t *term)
 {
   if (term->buflen == BUFSIZE)
     putchar('\a');

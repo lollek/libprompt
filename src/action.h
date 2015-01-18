@@ -4,7 +4,7 @@
 #include "terminal.h"
 
 void
-handle_printables(int ch, terminal_t *term);
+printc(int ch, terminal_t *term);
 
 void
 backward_delete_char(terminal_t *term);

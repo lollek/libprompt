@@ -6,19 +6,19 @@
 #include "../src/action.h"
 #include "../src/cutpaste.h"
 
-void test_handle_printables(terminal_t *term)
+void test_printc(terminal_t *term)
 {
   printf("[prompt]");
 
   /* Test print 1 char on empty term */
-  handle_printables('a', term);
+  printc('a', term);
   assert(term->buf[0] == 'a');
   assert(term->buf[1] == '\0');
   assert(term->buflen == 1);
   assert(term->cursorpos == 1);
 
   /* Test print (append) 1 char on term with only 1 char in it */
-  handle_printables('b', term);
+  printc('b', term);
   assert(term->buf[0] == 'a');
   assert(term->buf[1] == 'b');
   assert(term->buf[2] == '\0');
@@ -29,7 +29,7 @@ void test_handle_printables(terminal_t *term)
   beginning_of_line(term);
   assert(term->cursorpos == 0);
 
-  handle_printables('c', term);
+  printc('c', term);
   assert(term->buf[0] == 'c');
   assert(term->buf[1] == 'a');
   assert(term->buf[2] == 'b');
@@ -38,7 +38,7 @@ void test_handle_printables(terminal_t *term)
   assert(term->cursorpos == 1);
 
   /* Test print at the middle of buffer */
-  handle_printables('d', term);
+  printc('d', term);
   assert(term->buf[0] == 'c');
   assert(term->buf[1] == 'd');
   assert(term->buf[2] == 'a');
@@ -53,13 +53,13 @@ void test_handle_printables(terminal_t *term)
   assert(term->cursorpos == term->buflen);
 
   while (term->buflen < BUFSIZE)
-    handle_printables('0', term);
+    printc('0', term);
   beginning_of_line(term);
 
   assert(term->buflen == BUFSIZE);
   assert(term->cursorpos == 0);
 
-  handle_printables('1', term);
+  printc('1', term);
   assert(term->buf[0] == 'c');
   assert(term->buf[1] == 'd');
   assert(term->buf[2] == 'a');
@@ -73,7 +73,7 @@ void test_handle_printables(terminal_t *term)
   assert(term->cursorpos == 1);
   assert(term->buflen == BUFSIZE);
 
-  handle_printables('1', term);
+  printc('1', term);
   assert(term->buf[0] == 'c');
   assert(term->buf[1] == 'd');
   assert(term->buf[2] == 'a');
@@ -87,7 +87,7 @@ void test_handle_printables(terminal_t *term)
   assert(term->cursorpos == BUFSIZE);
   assert(term->buflen == BUFSIZE);
 
-  handle_printables('1', term);
+  printc('1', term);
   assert(term->buf[BUFSIZE -1] == '0');
   assert(term->buf[BUFSIZE -2] == '0');
   assert(term->buflen == BUFSIZE);
@@ -99,7 +99,7 @@ int main(void)
   terminal_t term = { {'\0'}, 0, 0 };
   memset(&term, '\0', BUFSIZE);
 
-  test_handle_printables(&term);
+  test_printc(&term);
 
   beginning_of_line(&term);
   kill_line(&term);
