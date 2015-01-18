@@ -8,7 +8,7 @@
 
 void test_backward_forward_word(terminal_t *term)
 {
-  const char *tststr = "  ! Hello World  Hello  World---Hello   World\t\tHello";
+  const char *tststr = "  ! Hello World  Hello  World---Hello   World&&Hello";
   const size_t tstlen = strlen(tststr);
 
   /* Set up */
@@ -79,8 +79,8 @@ void test_backward_forward_word(terminal_t *term)
 
   forward_word(term);
   assert(term->buf[term->cursorpos -1] == 'd');
-  assert(term->buf[term->cursorpos] == '\t');
-  assert(term->buf[term->cursorpos +1] == '\t');
+  assert(term->buf[term->cursorpos] == '&');
+  assert(term->buf[term->cursorpos +1] == '&');
 
   forward_word(term);
   assert(term->buf[term->cursorpos -1] == 'o');
