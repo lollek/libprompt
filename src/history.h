@@ -1,8 +1,10 @@
 #ifndef PROMPT_HISTORY_H
 #define PROMPT_HISTORY_H
 
+#include <wchar.h>
+
 void
-history_save(char *text);
+history_save(wchar_t *text);
 
 void
 history_prev_cmd(terminal_t *term);

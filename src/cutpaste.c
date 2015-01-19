@@ -60,7 +60,8 @@ kill_push_new(wchar_t text[], size_t length)
     free(new);
     return;
   }
-  wmemcpy(new->text, text, length +1);
+  wmemcpy(new->text, text, length);
+  new->text[length] = L'\0';
 
   root->next = new;
   current_killringsize++;

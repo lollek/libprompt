@@ -11,7 +11,7 @@ typedef struct dll
 {
   struct dll *next;
   struct dll *prev;
-  char *text;
+  wchar_t *text;
 }
 histlink_t;
 
@@ -19,7 +19,7 @@ static histlink_t *root = NULL;
 static histlink_t *current = NULL;
 static size_t current_histsize = 0;
 
-static char *tmpline = NULL;
+static wchar_t *tmpline = NULL;
 
 static int
 history_init_root(void)
@@ -47,7 +47,7 @@ history_unshift_oldest(void)
 }
 
 static void
-history_push_new(char *text)
+history_push_new(wchar_t text[])
 {
   current->next = malloc(sizeof *current);
   if (current->next == NULL)
@@ -55,7 +55,7 @@ history_push_new(char *text)
 
   current->next->next = NULL;
   current->next->prev = current;
-  current->next->text = strdup(text);
+  current->next->text = wcsdup(text);
   if (current->next->text == NULL)
   {
     free(current->next);
@@ -73,17 +73,17 @@ history_save_tmpline(terminal_t *term)
   if (tmpline != NULL)
     free(tmpline);
 
-  tmpline = malloc(term->buflen +1);
+  tmpline = malloc(sizeof(wchar_t) * (term->buflen +1));
   if (tmpline == NULL)
     return 1;
 
-  memcpy(tmpline, term->buf, term->buflen);
-  tmpline[term->buflen] = '\0';
+  wmemcpy(tmpline, term->buf, term->buflen);
+  tmpline[term->buflen] = L'\0';
   return 0;
 }
 
 void
-history_save(char *text)
+history_save(wchar_t text[])
 {
   if (root == NULL && history_init_root() != 0)
     return;
