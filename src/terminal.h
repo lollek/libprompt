@@ -1,13 +1,13 @@
 #ifndef PROMPT_TERMINAL_H
 #define PROMPT_TERMINAL_H
 
-typedef unsigned length_t;
+#include <wchar.h>
 
 typedef struct
 {
-  char buf[BUFSIZE +1];
-  length_t buflen;
-  length_t cursorpos;
+  wchar_t buf[BUFSIZE +1];
+  size_t buflen;
+  size_t cursorpos;
 }
 terminal_t;
 
