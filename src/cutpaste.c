@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <wchar.h>
 
 #include "action.h"
 
@@ -9,7 +10,7 @@
 typedef struct ll
 {
   struct ll *next;
-  char *text;
+  wchar_t *text;
 }
 textlink_t;
 
@@ -46,21 +47,20 @@ kill_unshift_oldest(void)
 }
 
 static void
-kill_push_new(char text[], size_t length)
+kill_push_new(wchar_t text[], size_t length)
 {
   textlink_t *new = malloc(sizeof *new);
   if (new == NULL)
     return;
 
   new->next = root->next;
-  new->text = malloc(length +1);
+  new->text = malloc(sizeof(wchar_t) * (length +1));
   if (new->text == NULL)
   {
     free(new);
     return;
   }
-  memcpy(new->text, text, length);
-  new->text[length] = 0;
+  wmemcpy(new->text, text, length +1);
 
   root->next = new;
   current_killringsize++;
@@ -98,14 +98,14 @@ kill_clear(void)
 void
 yank(terminal_t *term)
 {
-  char *pastedata;
+  wchar_t *pastedata;
   size_t pastedatalen;
 
   if (root == NULL)
     return;
 
   pastedata = root->next->text;
-  pastedatalen = strlen(pastedata);
+  pastedatalen = wcslen(pastedata);
   if (pastedatalen + term->buflen > BUFSIZE)
   {
     putchar('\a');
@@ -114,14 +114,14 @@ yank(terminal_t *term)
 
   if (term->cursorpos != term->buflen)
   {
-    unsigned i;
+    size_t i;
 
-    memmove(term->buf + term->cursorpos + pastedatalen,
-            term->buf + term->cursorpos, term->buflen - term->cursorpos);
-    memcpy(term->buf + term->cursorpos, pastedata, pastedatalen);
+    wmemmove(term->buf + term->cursorpos + pastedatalen,
+             term->buf + term->cursorpos, term->buflen - term->cursorpos);
+    wmemcpy(term->buf + term->cursorpos, pastedata, pastedatalen);
     term->buflen += pastedatalen;
 
-    fwrite(term->buf + term->cursorpos, sizeof(char),
+    fwrite(term->buf + term->cursorpos, sizeof(wchar_t),
            term->buflen - term->cursorpos, stdout);
     term->cursorpos += pastedatalen;
 
@@ -130,8 +130,8 @@ yank(terminal_t *term)
   }
   else
   {
-    memcpy(term->buf + term->buflen, pastedata, pastedatalen);
-    fwrite(term->buf + term->cursorpos, sizeof(char), pastedatalen, stdout);
+    wmemcpy(term->buf + term->buflen, pastedata, pastedatalen);
+    fwrite(term->buf + term->cursorpos, sizeof(wchar_t), pastedatalen, stdout);
     term->cursorpos = term->buflen = term->buflen + pastedatalen;
   }
 }
@@ -139,8 +139,8 @@ yank(terminal_t *term)
 void
 backward_kill_line(terminal_t *term)
 {
-  char tempbuf[BUFSIZE];
-  length_t tempbufsiz;
+  wchar_t tempbuf[BUFSIZE];
+  size_t tempbufsiz;
   if (term->cursorpos == 0)
   {
     putchar('\a');
@@ -150,15 +150,15 @@ backward_kill_line(terminal_t *term)
   if (root == NULL && kill_init_root() != 0)
     return;
 
-  memcpy(tempbuf, term->buf, term->cursorpos);
+  wmemcpy(tempbuf, term->buf, term->cursorpos);
   tempbufsiz = term->cursorpos;
-  memmove(term->buf, term->buf + term->cursorpos,
-          term->buflen - term->cursorpos);
+  wmemmove(term->buf, term->buf + term->cursorpos,
+           term->buflen - term->cursorpos);
 
   term->buflen -= term->cursorpos;
   clear_prompt(term);
 
-  fwrite(term->buf, sizeof(char), term->buflen, stdout);
+  fwrite(term->buf, sizeof(wchar_t), term->buflen, stdout);
   term->cursorpos = term->buflen;
   beginning_of_line(term);
 
@@ -170,9 +170,9 @@ backward_kill_line(terminal_t *term)
 void
 kill_word(terminal_t *term)
 {
-  char tempbuf[BUFSIZE];
+  wchar_t tempbuf[BUFSIZE];
   size_t tempbufsiz;
-  unsigned cut_from = term->cursorpos;
+  size_t cut_from = term->cursorpos;
 
   if (term->cursorpos == term->buflen)
     return;
@@ -181,14 +181,14 @@ kill_word(terminal_t *term)
 
   forward_word(term);
   tempbufsiz = term->cursorpos - cut_from;
-  memcpy(tempbuf, term->buf + cut_from, tempbufsiz);
-  memmove(term->buf + cut_from, term->buf + term->cursorpos,
-          term->buflen - term->cursorpos);
+  wmemcpy(tempbuf, term->buf + cut_from, tempbufsiz);
+  wmemmove(term->buf + cut_from, term->buf + term->cursorpos,
+           term->buflen - term->cursorpos);
   term->buflen -= term->cursorpos - cut_from;
 
   while (term->cursorpos > cut_from)
     backward_char(term);
-  fwrite(term->buf, sizeof(char), term->buflen, stdout);
+  fwrite(term->buf, sizeof(wchar_t), term->buflen, stdout);
   fwrite("\033[J\033[K", sizeof(char), sizeof("\033[J\033[K"), stdout);
 
   term->cursorpos = term->buflen;
