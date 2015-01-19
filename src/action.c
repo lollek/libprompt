@@ -1,36 +1,35 @@
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
 
 #include "action.h"
 
 void
-printc(char ch, terminal_t *term)
+printc(wchar_t ch, terminal_t *term)
 {
   if (term->buflen == BUFSIZE)
-    putchar('\a');
+    putwchar(L'\a');
   else if (term->cursorpos != term->buflen)
   {
-    char movebackbuf[BUFSIZE];
-    const char *cpyfrom = term->buf + term->cursorpos;
-    char *cpyto = term->buf + term->cursorpos +1;
-    const length_t cpysiz = term->buflen - term->cursorpos;
-    length_t i;
+    wchar_t movebackbuf[BUFSIZE];
+    const wchar_t *cpyfrom = term->buf + term->cursorpos;
+    wchar_t *cpyto = term->buf + term->cursorpos +1;
+    const size_t cpysiz = term->buflen - term->cursorpos;
+    size_t i;
 
-    memmove(cpyto, cpyfrom, cpysiz);
+    wmemmove(cpyto, cpyfrom, cpysiz);
     term->buflen += 1;
 
     term->buf[term->cursorpos] = ch;
-    fwrite(cpyfrom, sizeof(char), cpysiz +1, stdout);
+    fwrite(cpyfrom, sizeof(wchar_t), cpysiz +1, stdout);
     term->cursorpos += 1;
 
     for (i = term->cursorpos; i < term->buflen ; ++i)
-      movebackbuf[i - term->cursorpos] = '\b';
-    fwrite(movebackbuf, sizeof(char), cpysiz, stdout);
+      movebackbuf[i - term->cursorpos] = L'\b';
+    fwrite(movebackbuf, sizeof(wchar_t), cpysiz, stdout);
   }
   else
   {
-    putchar(ch);
+    putwchar(ch);
     term->buf[term->cursorpos] = ch;
     term->cursorpos += 1;
     term->buflen += 1;
@@ -41,41 +40,41 @@ void
 backward_delete_char(terminal_t *term)
 {
   if (term->cursorpos == 0)
-    putchar('\a');
+    putwchar(L'\a');
   else if (term->cursorpos == term->buflen)
   {
-    fwrite("\b \b", sizeof(char), 3, stdout);
+    fwrite(L"\b \b", sizeof(wchar_t), sizeof(L"\b \b"), stdout);
     term->cursorpos -= 1;
     term->buflen -= 1;
   }
   else
   {
-    char outbuf[BUFSIZE * 3];
-    char *outbufpos = outbuf;
-    length_t i;
+    wchar_t outbuf[BUFSIZE * 3];
+    wchar_t *outbufpos = outbuf;
+    size_t i;
 
-    memmove(term->buf + term->cursorpos -1, term->buf + term->cursorpos,
-            term->buflen - term->cursorpos);
+    wmemmove(term->buf + term->cursorpos -1, term->buf + term->cursorpos,
+             term->buflen - term->cursorpos);
     term->buflen -= 1;
     term->cursorpos -= 1;
 
-    *outbufpos = '\b';
+    *outbufpos = L'\b';
     outbufpos++;
 
-    memcpy(outbufpos, term->buf + term->cursorpos,
-           term->buflen - term->cursorpos);
+    wmemcpy(outbufpos, term->buf + term->cursorpos,
+            term->buflen - term->cursorpos);
     outbufpos += term->buflen - term->cursorpos;
 
-    memcpy(outbufpos, " \b", 2);
+    wmemcpy(outbufpos, L" \b", 2);
     outbufpos += 2;
 
     for (i = term->cursorpos; i < term->buflen; ++i)
     {
-      *outbufpos = '\b';
+      *outbufpos = L'\b';
       outbufpos++;
     }
 
-    fwrite(outbuf, sizeof(char), outbufpos - outbuf, stdout);
+    fwrite(outbuf, sizeof(wchar_t), outbufpos - outbuf, stdout);
   }
 }
 
@@ -87,8 +86,8 @@ backward_word(terminal_t *term)
   do
     backward_char(term);
   while (term->cursorpos > 0 &&
-         (!isalnum(term->buf[term->cursorpos])
-          || isalnum(term->buf[term->cursorpos -1])));
+         (!iswalnum(term->buf[term->cursorpos])
+          || iswalnum(term->buf[term->cursorpos -1])));
 }
 
 void
@@ -102,10 +101,10 @@ void
 backward_char(terminal_t *term)
 {
   if (term->cursorpos == 0)
-    putchar('\a');
+    putwchar(L'\a');
   else
   {
-    putchar('\b');
+    putwchar(L'\b');
     term->cursorpos -= 1;
   }
 }
@@ -113,20 +112,20 @@ backward_char(terminal_t *term)
 void
 clear_screen(terminal_t *term, const char *prompt)
 {
-  fwrite("\033[2J\033[:H", sizeof(char), sizeof("\033[2J\033[;H"), stdout);
+  fwrite(L"\033[2J\033[:H", sizeof(wchar_t), sizeof(L"\033[2J\033[;H"), stdout);
 
   if (prompt != NULL)
-    printf("%s", prompt);
+    wprintf("%s", prompt);
 
   if (term->buflen != 0)
   {
-    char tmpbuf[BUFSIZE *2];
-    unsigned i = 0;
+    wchar_t tmpbuf[BUFSIZE *2];
+    size_t i = 0;
     for (i = 0; i < term->buflen; ++i)
       tmpbuf[i] = term->buf[i];
     for (i += term->cursorpos; i - term->buflen < term->buflen; ++i)
       tmpbuf[i - term->buflen] = term->buf[i - term->buflen];
-    fwrite(tmpbuf, sizeof(char), i, stdout);
+    fwrite(tmpbuf, sizeof(wchar_t), i, stdout);
   }
 }
 
@@ -134,7 +133,7 @@ void
 clear_prompt(terminal_t *term)
 {
   beginning_of_line(term);
-  fwrite("\033[K\033[J", sizeof(char), sizeof("\033[K\033[J"), stdout);
+  fwrite(L"\033[K\033[J", sizeof(wchar_t), sizeof(L"\033[K\033[J"), stdout);
 }
 
 void
@@ -156,12 +155,12 @@ forward_char(terminal_t *term)
 {
   if (term->cursorpos < term->buflen)
   {
-    putchar(term->buf[term->cursorpos++]);
+    putwchar(term->buf[term->cursorpos++]);
     return 0;
   }
   else
   {
-    putchar('\a');
+    putwchar(L'\a');
     return 1;
   }
 }
@@ -172,20 +171,20 @@ forward_word(terminal_t *term)
   while (term->cursorpos < term->buflen)
   {
     forward_char(term);
-    if (!isalnum(term->buf[term->cursorpos])
-        && isalnum(term->buf[term->cursorpos -1]))
+    if (!iswalnum(term->buf[term->cursorpos])
+        && iswalnum(term->buf[term->cursorpos -1]))
       return;
   }
 }
 
 void
-prompt_set_text(char newdata[], terminal_t *term)
+prompt_set_text(wchar_t newdata[], terminal_t *term)
 {
-  size_t newdatasiz = strlen(newdata);
+  size_t newdatasiz = wcslen(newdata);
 
   clear_prompt(term);
 
-  strcpy(term->buf, newdata);
-  fwrite(term->buf, sizeof(char), newdatasiz, stdout);
+  wcscpy(term->buf, newdata);
+  fwrite(term->buf, sizeof(wchar_t), newdatasiz, stdout);
   term->cursorpos = term->buflen = newdatasiz;
 }
