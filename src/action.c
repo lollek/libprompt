@@ -4,37 +4,61 @@
 
 #include "action.h"
 
-void
-printc(char ch, terminal_t *term)
+size_t
+prints(const char *str, terminal_t *term)
 {
+  size_t chars_to_write;
+  size_t buf_space_left;
+
   if (term->buflen == BUFSIZE)
-    putchar('\a');
-  else if (term->cursorpos != term->buflen)
   {
-    char movebackbuf[BUFSIZE];
-    const char *cpyfrom = term->buf + term->cursorpos;
-    char *cpyto = term->buf + term->cursorpos +1;
-    const length_t cpysiz = term->buflen - term->cursorpos;
-    length_t i;
-
-    memmove(cpyto, cpyfrom, cpysiz);
-    term->buflen += 1;
-
-    term->buf[term->cursorpos] = ch;
-    fwrite(cpyfrom, sizeof(char), cpysiz +1, stdout);
-    term->cursorpos += 1;
-
-    for (i = term->cursorpos; i < term->buflen ; ++i)
-      movebackbuf[i - term->cursorpos] = '\b';
-    fwrite(movebackbuf, sizeof(char), cpysiz, stdout);
+    putchar('\a');
+    return 0;
   }
+
+  chars_to_write = strlen(str);
+  buf_space_left = BUFSIZE - term->buflen;
+  if (chars_to_write > buf_space_left)
+    chars_to_write = buf_space_left;
+
+  if (term->cursorpos == term->buflen)
+  {
+    fwrite(str, sizeof(char), chars_to_write, stdout);
+    memcpy(term->buf + term->buflen, str, chars_to_write);
+    term->buflen += chars_to_write;
+    term->cursorpos = term->buflen;
+    return chars_to_write;
+  }
+
   else
   {
-    putchar(ch);
-    term->buf[term->cursorpos] = ch;
-    term->cursorpos += 1;
-    term->buflen += 1;
+    char movebackbuf[BUFSIZE];
+    size_t i;
+
+    memmove(term->buf + term->cursorpos + chars_to_write,
+            term->buf + term->cursorpos,
+            term->buflen - term->cursorpos);
+    memcpy(term->buf + term->cursorpos, str, chars_to_write);
+    term->buflen += chars_to_write;
+
+    fwrite(term->buf + term->cursorpos, sizeof(char),
+           term->buflen - term->cursorpos, stdout);
+    term->cursorpos += chars_to_write;
+
+    for (i = term->cursorpos; i < term->buflen; ++i)
+      movebackbuf[i - term->cursorpos] = '\b';
+    fwrite(movebackbuf, sizeof(char), term->buflen - term->cursorpos, stdout);
+    return chars_to_write;
   }
+}
+
+size_t
+printc(char ch, terminal_t *term)
+{
+  char buf[2];
+  buf[0] = ch;
+  buf[1] = '\0';
+  return prints(buf, term);
 }
 
 void

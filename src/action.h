@@ -3,8 +3,25 @@
 
 #include "terminal.h"
 
-void
+/* printc - add a characters to terminal
+ * @ch		character to add
+ * @term	current terminal
+ *
+ * Try to print the given characters to terminal
+ * Returns the number of characters printed
+ */
+size_t
 printc(char ch, terminal_t *term);
+
+/* prints - add several characters to terminal
+ * @str		string to add
+ * @term	current terminal
+ *
+ * Tries to add the string to the terminal
+ * Returns the number of characters printed
+ */
+size_t
+prints(const char *str, terminal_t *term);
 
 void
 backward_delete_char(terminal_t *term);
