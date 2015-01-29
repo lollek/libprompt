@@ -188,7 +188,7 @@ kill_word(terminal_t *term)
 
   while (term->cursorpos > cut_from)
     backward_char(term);
-  fwrite(term->buf, sizeof(char), term->buflen, stdout);
+  fwrite(term->buf + term->cursorpos, sizeof(char), term->buflen - term->cursorpos, stdout);
   fwrite("\033[J\033[K", sizeof(char), sizeof("\033[J\033[K"), stdout);
 
   term->cursorpos = term->buflen;
