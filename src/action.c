@@ -137,7 +137,8 @@ backward_char(terminal_t *term)
 void
 clear_screen(terminal_t *term, const char *prompt)
 {
-  fwrite("\033[2J\033[:H", sizeof(char), sizeof("\033[2J\033[;H"), stdout);
+  const char *clear_screen_cmd = "\033[2J\033[;H";
+  fwrite(clear_screen_cmd, sizeof(char), sizeof(clear_screen_cmd), stdout);
 
   if (prompt != NULL)
     printf("%s", prompt);
