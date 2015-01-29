@@ -48,6 +48,7 @@ install:$(LIBNAME)
 	@echo
 	@echo "Run 'make testfile' if you want to test-link the library"
 	@echo "Note that you might need to run ldconfig first"
+.PHONY: install
 
 testfile: LDFLAGS+= -lprompt
 testfile:	$(LIBNAME) tests/main.o
@@ -59,28 +60,32 @@ test: $(LIBNAME) $(TESTOBJ)
 	$(foreach test, $(TESTOBJ),\
 	  $(CC) $(LDFLAGS) -o test $(test) $(OBJFILES) && ./test${\n})
 	@$(RM) test
+.PHONY: test
 
 debug: CFLAGS+= -g -DDEBUG
 debug: LDFLAGS+= -L. -lprompt
 debug: $(LIBNAME) tests/main.o
 	$(CC) $(LDFLAGS) -o debug $^
 	LD_LIBRARY_PATH=. ./debug
+.PHONY: debug
 
 debugmem: CFLAGS+= -g -DDEBUG -fsanitize=address -fno-omit-frame-pointer
 debugmem: LDFLAGS+= -fsanitize=address
 debugmem: $(OBJFILES) tests/main.o
 	$(CC) $(LDFLAGS) -o debug $^
 	./debug
+.PHONY: debugmem
 
 debugheap: CFLAGS+= -g -DDEBUG
 debugheap: $(OBJFILES) tests/main.o
 	$(CC) $(LDFLAGS) -o debug $^
 	valgrind ./debug
+.PHONY: debugheap
 
 lint:
 	$(LINT) $(LINTFLAGS) $(SRCFILES) $(HEADERS)
+.PHONY: lint
 
 clean:
 	$(RM) $(OBJFILES) $(TESTOBJ) $(LIBNAME) testfile debug tests/main.o
-
-.PHONY:	clean lint testfile test debug debugmem install
+.PHONY: clean
