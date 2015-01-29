@@ -4,6 +4,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #include "terminal.h"
 #include "action.h"
@@ -18,16 +20,27 @@
 char *
 prompt(const char *prompt)
 {
-  return prompt_r(prompt, NULL);
+  wchar_t buf[PROMPT_BUF_SIZE];
+  size_t bufsiz;
+  char *retval = NULL;
+
+  prompt_r(prompt, buf);
+  bufsiz = wcstombs(NULL, buf, 0) +1;
+  if (bufsiz == (size_t)-1)
+    return NULL;
+
+  retval = malloc(bufsiz);
+  wcstombs(retval, buf, bufsiz);
+  return retval;
 }
 
-char *
-prompt_r(const char *prompt, char *buffer)
+wchar_t *
+prompt_r(const char *prompt, wchar_t *buffer)
 {
   struct termios oldterm;
   struct termios tmpterm;
   terminal_t terminal = { {'\0'}, 0, 0 };
-  int ch;
+  wint_t ch;
 
   tcgetattr(STDIN_FILENO, &oldterm);
   tmpterm = oldterm;
@@ -39,17 +52,17 @@ prompt_r(const char *prompt, char *buffer)
 
   do
   {
-    ch = getchar();
+    ch = getwchar();
 
-    if (ch == EOF || ch == '\n')
+    if (ch == WEOF || ch == L'\n')
       break;
 
-    else if (isprint(ch))
+    else if (iswprint(ch))
       printc(ch, &terminal);
 
     else if (ch == ESCAPE)
     {
-      ch = getchar();
+      ch = getwchar();
       switch (ch)
       {
         case 'b': backward_word(&terminal); break;
@@ -58,18 +71,18 @@ prompt_r(const char *prompt, char *buffer)
         case '<': history_first_cmd(&terminal); break;
         case '>': history_last_cmd(&terminal); break;
         case '[': /* ARROW KEYS */
-          ch = getchar();
+          ch = getwchar();
           switch (ch)
           {
             case 'A': history_prev_cmd(&terminal); break;
             case 'B': history_next_cmd(&terminal); break;
             case 'C': forward_char(&terminal); break;
             case 'D': backward_char(&terminal); break;
-            default: putchar('\a'); break;
+            default: putwchar(L'\a'); break;
           }
           break;
 #ifdef DEBUG
-        default: printf("(E)%d", ch); break;
+        default: wprintf(L"(E)%d", ch); break;
 #endif
       }
     }
@@ -93,29 +106,29 @@ prompt_r(const char *prompt, char *buffer)
       case CTRL('Y'): yank(&terminal); break;
       case CTRL('U'): backward_kill_line(&terminal); break;
 #ifdef DEBUG
-      default: printf("%d", ch); break;
+      default: wprintf(L"%d", ch); break;
 #endif
     }
   }
-  while (ch != EOF);
-  putchar('\n');
+  while (ch != WEOF);
+  putwchar(L'\n');
 
   tcsetattr(STDIN_FILENO, TCSANOW, &oldterm);
 
-  if (ch == EOF && terminal.buflen == 0)
+  if (ch == WEOF && terminal.buflen == 0)
     return NULL;
 
   if (buffer == NULL)
   {
-    buffer = malloc(terminal.buflen + 1);
+    buffer = malloc(sizeof(wchar_t) * (terminal.buflen + 1));
     if (buffer == NULL)
       return NULL;
   }
 
-  memcpy(buffer, terminal.buf, terminal.buflen);
-  buffer[terminal.buflen] = '\0';
+  wmemcpy(buffer, terminal.buf, terminal.buflen);
+  buffer[terminal.buflen] = L'\0';
 
-  if (buffer[0] != '\0')
+  if (buffer[0] != L'\0')
     history_save(buffer);
 
   return buffer;

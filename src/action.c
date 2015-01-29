@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <wctype.h>
 
 #include "action.h"
 
@@ -115,7 +116,7 @@ clear_screen(terminal_t *term, const char *prompt)
   fwrite(L"\033[2J\033[:H", sizeof(wchar_t), sizeof(L"\033[2J\033[;H"), stdout);
 
   if (prompt != NULL)
-    wprintf("%s", prompt);
+    printf("%s", prompt);
 
   if (term->buflen != 0)
   {

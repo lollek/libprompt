@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <wchar.h>
 
 #ifdef DEBUG
 #  include "../src/prompt.h"
@@ -11,8 +12,7 @@ int main(void)
 {
   for (;;)
   {
-    char buf[PROMPT_BUF_SIZE];
-    char *line = prompt_r("> ", buf);
+    char *line = prompt("> ");
     if (line == NULL)
       break;
 

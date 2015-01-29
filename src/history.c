@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "action.h"
 #include "terminal.h"
@@ -91,7 +91,7 @@ history_save(wchar_t text[])
   while (current->next != NULL)
     current = current->next;
 
-  if (current != root && !strcmp(text, current->text))
+  if (current != root && !wcscmp(text, current->text))
     return;
 
   if (current_histsize == HISTSIZEMAX)

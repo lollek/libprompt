@@ -17,6 +17,8 @@
 #ifndef PROMPT_PROMPT_H
 #define PROMPT_PROMPT_H
 
+#include <wchar.h>
+
 #define PROMPT_BUF_SIZE BUFSIZE +1
 
 /**
@@ -39,8 +41,8 @@ prompt(const char *prompt);
  * stored on the heap, it stores the data in @buffer and returns a reference to
  * it
  */
-char *
-prompt_r(const char *prompt, char *buffer);
+wchar_t *
+prompt_r(const char *prompt, wchar_t *buffer);
 
 
 /**
